@@ -1,0 +1,211 @@
+{
+  "tours": [
+    {
+      "id": "3d42b4a7-7cbb-40b1-acf7-d9b50ecd7e10",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "code": "FC-GL-210",
+      "title": "کمپ جنگل‌های هیرکانی",
+      "destination": "ماسال، گیلان",
+      "status": "published",
+      "price": 4850000,
+      "capacity": 24,
+      "sold": 19,
+      "leader": "آرمان توکلی",
+      "departure": "۱۴۰۵/۰۶/۲۰"
+    },
+    {
+      "id": "8b68eb92-c2aa-405d-9f7d-d79e1168214c",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "code": "FC-DT-118",
+      "title": "شب‌های کویر لوت",
+      "destination": "شهداد، کرمان",
+      "status": "published",
+      "price": 3900000,
+      "capacity": 18,
+      "sold": 14,
+      "leader": "سارا نیک‌پی",
+      "departure": "۱۴۰۵/۰۷/۰۵"
+    },
+    {
+      "id": "3aed08f0-c6be-4107-854f-052ba13708f3",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "code": "FC-MT-092",
+      "title": "صعود سبلان و دریاچه",
+      "destination": "اردبیل",
+      "status": "draft",
+      "price": 5700000,
+      "capacity": 15,
+      "sold": 0,
+      "leader": "میلاد رستگار",
+      "departure": "۱۴۰۵/۰۷/۱۸"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "8e27b366-0d0d-4294-8cb4-aa414d019e36",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "reference": "FCB-84219",
+      "customer": "نیلوفر احمدی",
+      "tour": "کمپ جنگل‌های هیرکانی",
+      "guests": 2,
+      "amount": 9700000,
+      "status": "paid",
+      "payment": "verified",
+      "createdAt": "2026-08-21T10:40:49.853Z"
+    },
+    {
+      "id": "dcd909fa-0e40-4b89-b01b-a4f38c1604dd",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "reference": "FCB-84220",
+      "customer": "ماهان کریمی",
+      "tour": "شب‌های کویر لوت",
+      "guests": 3,
+      "amount": 11115000,
+      "status": "pending",
+      "payment": "pending",
+      "createdAt": "2026-08-21T10:40:49.853Z"
+    },
+    {
+      "id": "15fd0e4c-c003-438c-8839-4767f0d4cb44",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "reference": "FCB-84221",
+      "customer": "رها نادری",
+      "tour": "کمپ جنگل‌های هیرکانی",
+      "guests": 1,
+      "amount": 4850000,
+      "status": "cancelled",
+      "payment": "refunded",
+      "createdAt": "2026-08-21T10:40:49.853Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "b4a4cdce-1b07-4d1a-a7a3-8d51713a74be",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "sku": "FC-TENT-04",
+      "title": "چادر چهار فصل هاسکی",
+      "category": "کمپ و اقامت",
+      "price": 14800000,
+      "stock": 4,
+      "reorderPoint": 6,
+      "status": "active"
+    },
+    {
+      "id": "7d1bb3d5-aa69-4ca5-a0e4-0dba7aa22040",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "sku": "FC-BAG-38",
+      "title": "کوله ترکینگ ۳۸ لیتری",
+      "category": "کوله و حمل",
+      "price": 6750000,
+      "stock": 17,
+      "reorderPoint": 5,
+      "status": "active"
+    },
+    {
+      "id": "4f5292ab-c9da-4152-8cfa-1580ce375a53",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "sku": "FC-LAMP-12",
+      "title": "چراغ کمپ خورشیدی",
+      "category": "نور و انرژی",
+      "price": 1850000,
+      "stock": 2,
+      "reorderPoint": 8,
+      "status": "active"
+    }
+  ],
+  "customers": [
+    {
+      "id": "3f6f6d12-d180-41f2-976f-53060317381f",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "name": "نیلوفر احمدی",
+      "phone": "09121234567",
+      "segment": "VIP",
+      "stage": "completed",
+      "trips": 7,
+      "spend": 42800000,
+      "points": 3860,
+      "status": "active"
+    },
+    {
+      "id": "e46c994f-d6d3-4af7-aea6-dd2a3786e630",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "name": "ماهان کریمی",
+      "phone": "09129876543",
+      "segment": "Explorer",
+      "stage": "deposit",
+      "trips": 2,
+      "spend": 12600000,
+      "points": 940,
+      "status": "active"
+    },
+    {
+      "id": "1cd2b103-b52d-472b-81a3-2f757b767fb4",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "name": "رها نادری",
+      "phone": "09123334455",
+      "segment": "New",
+      "stage": "contacted",
+      "trips": 0,
+      "spend": 0,
+      "points": 120,
+      "status": "active"
+    }
+  ],
+  "content": [
+    {
+      "id": "d52bdb25-d421-4935-b05b-305d1478bf5c",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "slot": "hero-01",
+      "title": "جنگل‌های بارانی و مه‌آلود",
+      "type": "hero",
+      "status": "published",
+      "schedule": "اکنون",
+      "author": "تیم محتوا"
+    },
+    {
+      "id": "ca5119cb-5a1d-4dd7-8164-9c7a0fc5aeb6",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "slot": "shop-02",
+      "title": "کمپ حرفه‌ای، سبک سفر کن",
+      "type": "shop-slide",
+      "status": "published",
+      "schedule": "اکنون",
+      "author": "تیم فروش"
+    },
+    {
+      "id": "a26da6ad-53f3-4efd-88f1-ce99cc17d1b6",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "slot": "blog-04",
+      "title": "راهنمای کمپ بدون اثر",
+      "type": "blog",
+      "status": "review",
+      "schedule": "۱۴۰۵/۰۶/۲۲",
+      "author": "سارا یوسفی"
+    }
+  ],
+  "tickets": [
+    {
+      "id": "8ae6cbb5-7dfa-40b1-b2a9-6879192fd14f",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "reference": "SUP-1028",
+      "subject": "تغییر تاریخ حرکت",
+      "customer": "ماهان کریمی",
+      "priority": "high",
+      "status": "open",
+      "owner": "پشتیبانی رزرو",
+      "sla": "۴۵ دقیقه"
+    },
+    {
+      "id": "d4cb2952-6e6e-4b40-aca2-3e7d126dc914",
+      "updatedAt": "2026-08-21T10:40:49.853Z",
+      "reference": "SUP-1029",
+      "subject": "راهنمای انتخاب چادر",
+      "customer": "آرزو امیدی",
+      "priority": "normal",
+      "status": "pending",
+      "owner": "فروشگاه",
+      "sla": "۲ ساعت"
+    }
+  ],
+  "audit": []
+}

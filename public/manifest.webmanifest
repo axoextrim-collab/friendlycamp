@@ -1,0 +1,11 @@
+{
+  "name": "فرندلی کمپ",
+  "short_name": "فرندلی کمپ",
+  "description": "تورهای طبیعت‌گردی و کمپینگ مسئولانه",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ebf7f7",
+  "theme_color": "#14382c"
+}
