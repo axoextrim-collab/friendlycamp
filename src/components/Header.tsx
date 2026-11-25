@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Menu, X, ChevronDown, PhoneCall, Sparkles, Languages, User } from 'lucide-react';
+import { ManagedText, ManagedAnchor, siteText } from '../cms/PublicContent';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, Menu, X, ShoppingBag, User } from 'lucide-react';
 import { FriendlyCampLogo } from './FriendlyCampLogo';
+import { SiteLink, useSiteLocation } from '../routing/navigation';
+import { sectionPath } from '../routing/routes';
 
 interface HeaderProps {
   onOpenSearch: () => void;
@@ -12,6 +15,8 @@ interface HeaderProps {
   onOpenProfile?: () => void;
   currentUserName?: string;
   overlay?: boolean;
+  onOpenCart?: () => void;
+  cartCount?: number;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -23,11 +28,29 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAuth,
   onOpenProfile,
   currentUserName,
-  overlay = false
+  overlay = false,
+  onOpenCart,
+  cartCount = 0
 }) => {
   const [pagesDropdownOpen, setPagesDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const outside = (event: PointerEvent) => { if (!headerRef.current?.contains(event.target as Node)) setMobileMenuOpen(false); };
+    const leave = (event: FocusEvent) => { if (!headerRef.current?.contains(event.target as Node)) setMobileMenuOpen(false); };
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { setMobileMenuOpen(false); menuButtonRef.current?.focus(); } };
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    const resize = () => { if (desktop.matches) setMobileMenuOpen(false); };
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('keydown', escape);
+    document.addEventListener('focusin', leave);
+    headerRef.current?.querySelector<HTMLElement>('#mobile-site-navigation a')?.focus({ preventScroll: true });
+    desktop.addEventListener('change', resize);
+    return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); document.removeEventListener('focusin', leave); desktop.removeEventListener('change', resize); };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     if (!overlay) return;
@@ -38,11 +61,12 @@ export const Header: React.FC<HeaderProps> = ({
   }, [overlay]);
 
   const isFa = lang === 'fa';
+  const location = useSiteLocation();
 
   const navItems = [
     { label: isFa ? 'خانه' : 'Home', id: 'hero' },
     { label: isFa ? 'تقویم سفری' : 'Calendar', id: 'calendar' },
-    { label: isFa ? 'تورها' : 'Tours', id: 'tours' },
+    { label: isFa ? 'تورها' : 'Tours', id: 'recommended-tours' },
     { label: isFa ? 'فروشگاه' : 'Shop', id: 'shop' },
     { label: isFa ? 'مقاصد' : 'Destinations', id: 'destinations' },
     { label: isFa ? 'درباره ما' : 'About', id: 'experience' },
@@ -51,7 +75,6 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   const handleNavClick = (id: string) => {
-    onNavigateSection(id);
     setMobileMenuOpen(false);
     setPagesDropdownOpen(false);
   };
@@ -65,24 +88,28 @@ export const Header: React.FC<HeaderProps> = ({
   const headerPositionClass = overlay ? 'fixed top-0 inset-x-0 z-50' : 'sticky top-0 z-50';
 
   return (
-    <header className={`${headerPositionClass} px-3 md:px-8 pt-2 pb-1 transition-all duration-300`}>
-      <div className={`max-w-7xl mx-auto ${headerShellClass} rounded-xl px-4 md:px-8 py-3 border flex items-center justify-between text-white relative transition-all duration-300`}>
+    <header ref={headerRef} className={`fc-site-header ${headerPositionClass} px-3 md:px-8 pt-2 pb-1 transition-all duration-300`}>
+      <div className={`fc-header-shell max-w-7xl mx-auto ${headerShellClass} rounded-xl px-4 md:px-8 py-3 border flex items-center justify-between text-white relative transition-all duration-300`}>
         
         {/* Left Side (RTL): Hamburger, Search and authentication */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <button
+          <button type="button"
+            ref={menuButtonRef}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2.5 rounded-full hover:bg-white/10 transition text-white lg:hidden"
-            aria-label="منو"
+            aria-label={siteText(mobileMenuOpen ? 'بستن منوی اصلی' : 'باز کردن منوی اصلی')}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-site-navigation"
             id="mobile-menu-btn"
           >
             {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
-          <button
+          <button type="button"
             onClick={onOpenSearch}
             className="p-2.5 rounded-full hover:bg-white/10 transition text-white/90 hover:text-white"
-            title={isFa ? 'جستجو' : 'Search'}
+            title={siteText(isFa ? 'جستجو' : 'Search')}
+            aria-label={siteText(isFa ? 'جست‌وجوی سایت' : 'Search site')}
             id="header-search-btn"
           >
             <Search size={20} />
@@ -90,19 +117,18 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Login / Register Button */}
           {currentUserName && onOpenProfile ? (
-            <button onClick={onOpenProfile} className="flex items-center gap-2 bg-lime-300 text-emerald-950 px-4 py-2 rounded-full text-xs font-black shadow-lg hover:bg-lime-200 transition" id="header-profile-btn" aria-label="باز کردن پروفایل همسفر">
-              <User size={16}/><span className="max-w-28 truncate">پروفایل {currentUserName.split(' ')[0]}</span>
-            </button>
+            <SiteLink href="/account" className="flex items-center gap-2 bg-lime-300 text-emerald-950 px-4 py-2 rounded-full text-xs font-black shadow-lg hover:bg-lime-200 transition" id="header-profile-btn" aria-label={siteText("باز کردن پروفایل همسفر")}>
+              <User size={20}/><span className="max-w-28 truncate hidden sm:inline"><ManagedText value={"پروفایل "}/><ManagedText value={currentUserName.split(' ')[0]}/></span>
+            </SiteLink>
           ) : onOpenAuth && (
-            <button
-              onClick={() => onOpenAuth('login')}
+            <SiteLink href="/login"
               className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white px-3.5 py-1.5 rounded-full text-xs font-black transition cursor-pointer border border-white/20 shadow-sm hover:scale-105"
-              title={isFa ? 'ورود و ثبت‌نام همنوردان' : 'Login / Register'}
+              title={siteText(isFa ? 'ورود و ثبت‌نام همنوردان' : 'Login / Register')}
               id="header-auth-btn"
             >
-              <User size={15} className="text-[#84cc16]" />
-              <span>{isFa ? 'ورود | ثبت‌نام' : 'Login'}</span>
-            </button>
+              <User size={18} className="text-[#84cc16] hidden sm:block" />
+              <span className="sm:hidden"><ManagedText value={isFa ? 'ورود' : 'Login'}/></span><span className="hidden sm:inline"><ManagedText value={isFa ? 'ورود | ثبت‌نام' : 'Login'}/></span>
+            </SiteLink>
           )}
 
         </div>
@@ -110,58 +136,30 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Desktop Menu Links */}
         <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold text-white/90">
           {navItems.map((item) => (
-            <button
+            <SiteLink href={sectionPath(item.id)} aria-current={(location.pathname === sectionPath(item.id) || (sectionPath(item.id) !== '/' && location.pathname.startsWith(sectionPath(item.id) + '/'))) ? 'page' : undefined}
               key={item.label}
               onClick={() => handleNavClick(item.id)}
-              className="hover:text-[#f59e0b] transition cursor-pointer py-2"
+              className="header-menu-link cursor-pointer py-2"
             >
-              {item.label}
-            </button>
+              <ManagedText value={item.label}/>
+            </SiteLink>
           ))}
         </nav>
 
         {/* Right Side (RTL): Brand Logo */}
-        <div onClick={() => handleNavClick('hero')} className="cursor-pointer">
+        <SiteLink href="/" aria-label={siteText("صفحه اصلی فرندلی کمپ")} onClick={() => handleNavClick('hero')} className="fc-header-brand cursor-pointer">
           <FriendlyCampLogo size="md" variant="light" />
-        </div>
+        </SiteLink>
 
       </div>
 
       {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-x-3 top-20 bg-[#14382c] text-white rounded-xl p-6 shadow-2xl border border-white/10 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="flex justify-between items-center pb-4 mb-4 border-b border-white/10">
-            <FriendlyCampLogo size="sm" variant="light" />
-            <button onClick={() => setMobileMenuOpen(false)} className="text-white/70 hover:text-white">
-              <X size={20} />
-            </button>
-          </div>
+      {mobileMenuOpen && <nav id="mobile-site-navigation" className="fc-mobile-nav lg:hidden" aria-label={siteText(isFa ? 'منوی اصلی موبایل' : 'Mobile navigation')}>
+        <div className="fc-mobile-nav-heading"><strong><ManagedText value={isFa ? 'مسیرت را انتخاب کن' : 'Explore Friendly Camp'}/></strong><button type="button" aria-label={siteText("بستن منوی اصلی")} onClick={() => { setMobileMenuOpen(false); menuButtonRef.current?.focus(); }}><X size={22}/></button></div>
+        <div className="fc-mobile-nav-grid">{navItems.map(item => <SiteLink key={item.id} href={sectionPath(item.id)} aria-current={location.pathname === sectionPath(item.id) ? 'page' : undefined} onClick={() => handleNavClick(item.id)}><ManagedText value={item.label}/></SiteLink>)}</div>
+        <div className="fc-mobile-nav-tools">{onOpenCart && <button type="button" onClick={() => { menuButtonRef.current?.focus({ preventScroll: true }); setMobileMenuOpen(false); onOpenCart(); }}><ShoppingBag size={18}/><ManagedText value={"سبد رزرو"}/><ManagedText value={cartCount ? ` (${cartCount.toLocaleString('fa-IR')})` : ''}/></button>}<SiteLink href="/booking/receipt" onClick={() => setMobileMenuOpen(false)}><ManagedText value={"پیگیری رزرو"}/></SiteLink></div>
+      </nav>}
 
-          <div className="flex flex-col gap-3 font-medium">
-            {navItems.map((item) => (
-              <div key={item.label} className="border-b border-white/5 pb-2">
-                <button
-                  onClick={() => handleNavClick(item.id)}
-                  className="w-full text-right py-1.5 text-white/90 hover:text-[#f59e0b] transition text-base font-semibold cursor-pointer"
-                >
-                  {item.label}
-                </button>
-              </div>
-            ))}
-
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenContact();
-              }}
-              className="mt-4 w-full bg-[#f59e0b] text-slate-950 font-black py-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg cursor-pointer"
-            >
-              <PhoneCall size={18} />
-              <span>تماس با فرندلی کمپ</span>
-            </button>
-          </div>
-        </div>
-      )}
     </header>
   );
 };

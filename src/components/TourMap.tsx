@@ -1,0 +1,3 @@
+import React,{lazy,Suspense,useState} from 'react';
+const RouteMap=lazy(()=>import('./RouteMap'));
+export function TourMap({tourId,available}:{tourId:string;available:boolean}){const [open,setOpen]=useState(false);return <section id="tour-route"><h2>مسیر GPS و ارزیابی مسیر</h2>{!available?<p>مسیر GPS مستند برای این برنامه هنوز منتشر نشده است.</p>:open?<Suspense fallback={<p role="status">در حال دریافت نمایش نقشه…</p>}><RouteMap tourId={tourId}/></Suspense>:<><p>خط مسیر از داده ثبت‌شده برگزارکننده نمایش داده می‌شود. با باز کردن نقشه، نقشه پایه از OpenStreetMap بارگیری خواهد شد.</p><button type="button" className="sp-button" onClick={()=>setOpen(true)}>نمایش نقشه واقعی مسیر</button></>}</section>;}

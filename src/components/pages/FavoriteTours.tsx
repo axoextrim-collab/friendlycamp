@@ -1,0 +1,8 @@
+import React from 'react';
+import './pages.css';
+import {useTourTools,toggleTourFavorite} from '../../hooks/useTourTools';
+import {useTourCatalog} from '../../hooks/useTourCatalog';
+import {TourCard} from './TourCard';
+import {PageHeading} from './PageUI';
+import {TourToolsBar} from '../TourActions';
+export function FavoriteTours({embedded=false}:{embedded?:boolean}){const tools=useTourTools();const catalog=useTourCatalog();const tours=catalog.tours.filter(tour=>tools.favorites.includes(tour.id));const missing=tools.favorites.filter(id=>!catalog.tours.some(tour=>tour.id===id));return <>{!embedded&&<PageHeading eyebrow="فهرست شخصی سفر" title="تورهایی که نگه داشته‌ای." description={tools.status==='signed'?'علاقه‌مندی‌های ذخیره‌شده در حساب تو.':'علاقه‌مندی‌های این مرورگر؛ ذخیره در حساب پس از ورود از کارت هر تور در دسترس است.'}/>}<TourToolsBar/>{catalog.loading||tools.status==='loading'?<p role="status">در حال دریافت علاقه‌مندی‌ها…</p>:catalog.error?<p role="alert" className="td-error">{catalog.error}<button type="button" onClick={()=>void catalog.refresh()}>تلاش دوباره</button></p>:<>{!tools.favorites.length&&<div className="sp-empty"><h2>هنوز توری ذخیره نکرده‌ای.</h2><p>از دکمه علاقه‌مندی روی کارت یا جزئیات تور استفاده کن.</p></div>}<div className="sp-tour-grid">{tours.map(tour=><TourCard key={tour.id} tour={tour}/>)}</div>{missing.map(id=><div className="td-notice" key={id}><p>یکی از تورهای ذخیره‌شده دیگر در فهرست عمومی نیست.</p><button type="button" disabled={tools.busy.includes(id)} onClick={()=>void toggleTourFavorite(id)}>برداشتن این مورد از علاقه‌مندی‌ها</button></div>)}</>}</>;}

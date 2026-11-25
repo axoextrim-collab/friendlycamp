@@ -1,3 +1,4 @@
+import { ManagedText, ManagedAnchor, siteText } from '../cms/PublicContent';
 import React from 'react';
 import { PhoneCall, CheckCircle2, Headphones, ShieldCheck, ArrowLeft } from 'lucide-react';
 
@@ -11,10 +12,10 @@ export const WhyChooseUs: React.FC<WhyChooseUsProps> = ({
   onNavigateSection
 }) => {
   const checkItems = [
-    { title: 'جزئیات کامل', subtitle: 'شفافیت کامل در هزینه‌ها و برنامه‌ها' },
-    { title: 'پس انداز بودجه', subtitle: 'بهترین نرخ تورهای طبیعت‌گردی' },
-    { title: 'مشاوره رایگان', subtitle: 'پاسخگویی سریع توسط کارشناسان' },
-    { title: 'تکمیل گواهینامه', subtitle: 'دارای مجوز رسمی سازمان گردشگری' }
+    { title: 'جزئیات برنامه', subtitle: 'بررسی مسیر، مدت و خدمات هر سفر' },
+    { title: 'بررسی هزینه', subtitle: 'مشاهده مبلغ و شرایط نوبت انتخابی' },
+    { title: 'هماهنگی سفر', subtitle: 'ثبت درخواست و تماس با پشتیبانی' },
+    { title: 'شرایط هر برنامه', subtitle: 'مرور خدمات و مقررات پیش از رزرو' }
   ];
 
   return (
@@ -29,39 +30,28 @@ export const WhyChooseUs: React.FC<WhyChooseUsProps> = ({
               <Headphones size={32} />
             </div>
 
-            <span className="text-xs font-black text-[#f59e0b] tracking-widest uppercase mb-1">
-              FRIENDLY CAMP 24/7 SUPPORT
-            </span>
+            <span className="text-xs font-black text-[#f59e0b] tracking-widest uppercase mb-1"><ManagedText value={"FRIENDLY CAMP · CONTACT"}/></span>
 
-            <h3 className="text-2xl font-black text-white mb-2">تماس با سرپرستان تور</h3>
+            <h3 className="text-2xl font-black text-white mb-2"><ManagedText value={"تماس با سرپرستان تور"}/></h3>
 
-            <a
+            <ManagedAnchor
               href="tel:09215014474"
               className="text-3xl sm:text-4xl font-black text-[#f59e0b] dir-ltr hover:scale-105 transition my-2 font-mono"
-            >
-              ۰۹۲۱۵۰۱۴۴۷۴
-            </a>
+            ><ManagedText value={"۰۹۲۱۵۰۱۴۴۷۴"}/></ManagedAnchor>
 
-            <p className="text-xs text-emerald-100/80 font-medium max-w-xs mt-2">
-              تیم سرپرستی باشگاه فرندلی کمپ آماده پاسخگویی و مشاوره سفر شماست.
-            </p>
+            <p className="text-xs text-emerald-100/80 font-medium max-w-xs mt-2"><ManagedText value={"تیم سرپرستی باشگاه فرندلی کمپ آماده پاسخگویی و مشاوره سفر شماست."}/></p>
 
-            <button
+            <button type="button"
               onClick={onOpenContact}
               className="mt-6 w-full bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black py-3 rounded-lg transition shadow-lg text-sm cursor-pointer"
-            >
-              ارسال پیام مستقیم
-            </button>
+            ><ManagedText value={"ارسال پیام مستقیم"}/></button>
           </div>
 
           {/* Right Column (RTL Right): Why Choose Us & Checklist */}
           <div className="lg:col-span-7 flex flex-col gap-6 text-right">
             <div>
-              <span className="inline-block px-4 py-1.5 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold mb-3 border border-amber-400/30">
-                مزایای باشگاه فرندلی کمپ
-              </span>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-4">
-                چرا فرندلی کمپ را <span className="text-[#f59e0b]">انتخاب کنید؟</span>
+              <span className="inline-block px-4 py-1.5 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold mb-3 border border-amber-400/30"><ManagedText value={"مزایای باشگاه فرندلی کمپ"}/></span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-4"><ManagedText value={"چرا فرندلی کمپ را "}/><span className="text-[#f59e0b]"><ManagedText value={"انتخاب کنید؟"}/></span>
               </h2>
             </div>
 
@@ -76,8 +66,8 @@ export const WhyChooseUs: React.FC<WhyChooseUsProps> = ({
                     <CheckCircle2 size={22} className="text-[#044e42]" />
                   </div>
                   <div className="text-right">
-                    <h4 className="font-extrabold text-white text-base">{item.title}</h4>
-                    <p className="text-xs text-emerald-100/70 font-medium">{item.subtitle}</p>
+                    <h4 className="font-extrabold text-white text-base"><ManagedText value={item.title}/></h4>
+                    <p className="text-xs text-emerald-100/70 font-medium"><ManagedText value={item.subtitle}/></p>
                   </div>
                 </div>
               ))}
@@ -85,11 +75,11 @@ export const WhyChooseUs: React.FC<WhyChooseUsProps> = ({
 
             {/* Learn More Button */}
             <div className="pt-4">
-              <button
+              <button type="button"
                 onClick={() => onNavigateSection('experience')}
                 className="bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black px-8 py-3.5 rounded-full shadow-lg hover:scale-105 transition text-base flex items-center gap-2 cursor-pointer"
               >
-                <span>بیشتر بدانید</span>
+                <span><ManagedText value={"بیشتر بدانید"}/></span>
                 <ArrowLeft size={18} />
               </button>
             </div>

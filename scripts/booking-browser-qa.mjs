@@ -1,0 +1,32 @@
+import { mkdtemp, mkdir, cp, copyFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { spawn } from 'node:child_process';
+import { createServer } from 'node:net';
+import { once } from 'node:events';
+import crypto from 'node:crypto';
+const project = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const directory = await mkdtemp(path.join(tmpdir(), 'friendly-booking-browser-'));
+await mkdir(path.join(directory, 'data'), { recursive: true });
+await copyFile(path.join(project, 'tests/fixtures/admin.json'), path.join(directory, 'data/admin.json'));
+const probe = createServer(); probe.listen(0, '127.0.0.1'); await once(probe, 'listening'); const port = probe.address().port; await new Promise(resolve => probe.close(resolve));
+await mkdir(path.join(directory, 'dist'), { recursive: true });
+await copyFile(path.join(project, 'dist/index.html'), path.join(directory, 'dist/index.html'));
+await copyFile(path.join(project, 'dist/manifest.webmanifest'), path.join(directory, 'dist/manifest.webmanifest'));
+await cp(path.join(project, 'dist/assets'), path.join(directory, 'dist/assets'), { recursive: true });
+await mkdir(path.join(directory, 'dist/images/moments'), { recursive: true }); await copyFile(path.join(project, 'public/images/moments/camp.webp'), path.join(directory, 'dist/images/moments/camp.webp'));
+const base = `http://localhost:${port}`;
+const child = spawn(process.execPath, [path.join(project, 'dist/server.cjs')], { cwd: directory, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, PORT: String(port), NODE_ENV: 'production', PUBLIC_SITE_URL: base, BOOKING_PAYMENT_MODE: 'sandbox', BOOKING_HOLD_SECONDS: '900', SESSION_SECRET: crypto.randomBytes(32).toString('hex'), ADMIN_BOOTSTRAP_EMAIL: 'admin@booking-qa.test', ADMIN_BOOTSTRAP_PASSWORD: 'BookingQaPassword1234', ADMIN_BOOTSTRAP_NAME: 'مدیر محیط آزمایشی', ADMIN_BOOTSTRAP_PHONE: '09120000000', PAYMENT_HTTP_URL: '', PAYMENT_API_TOKEN: '', SMS_HTTP_URL: '', SMS_API_TOKEN: '' } });
+child.stdout.resume(); child.stderr.on('data', data => { const text = String(data); if (/Error|error/.test(text)) process.stderr.write(text); });
+try {
+  let ready = false; for (let i = 0; i < 200; i++) { if (child.exitCode !== null) throw new Error('QA server exited before startup'); try { if ((await fetch(base + '/api/health')).ok) { ready = true; break; } } catch {} await new Promise(resolve => setTimeout(resolve, 100)); } if (!ready) throw new Error('QA server startup timed out');
+  const login = await fetch(base + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifier: 'admin@booking-qa.test', password: 'BookingQaPassword1234' }) }); if (!login.ok) throw new Error('QA admin bootstrap failed'); const cookie = login.headers.get('set-cookie').split(';')[0];
+  const dashboard = await (await fetch(base + '/api/admin/dashboard', { headers: { Cookie: cookie } })).json(); const tour = dashboard.resources.tours.find(tour => tour.status === 'published');
+  const config = { tourId: tour.id, startsAt: new Date(Date.now() + 10 * 86400000).toISOString(), capacity: 3, externalSold: 0, price: 1000000, active: true, origins: [{ id: 'origin-tehran', title: 'تهران، مبدأ آزمایشی', price: 100000 }], tents: [{ id: 'tent-2', title: 'چادر دو نفره آزمایشی', price: 200000, capacity: 2 }], extras: [{ id: 'sleeping-bag', title: 'کیسه خواب آزمایشی', price: 50000, maxQuantity: 3 }], groupDiscount: { minimum: 2, percent: 10 }, cancellation: { enabled: true, cutoffHours: 24, feePercent: 10 } };
+  const created = await fetch(base + '/api/admin/booking/departures', { method: 'POST', headers: { 'Content-Type': 'application/json', Cookie: cookie }, body: JSON.stringify(config) }); if (!created.ok) throw new Error('QA departure creation failed');
+  process.stdout.write(`QA_URL=${base}/tours/${tour.id}/book\nQA_ADMIN_URL=${base}/admin\nISOLATED_SANDBOX=true\n`);
+  process.stdout.write('To close the isolated server and remove its temporary data, enter: stop\n');
+  await new Promise(resolve => { process.once('SIGINT', resolve); process.once('SIGTERM', resolve); child.once('exit', resolve); process.stdin.setEncoding('utf8'); process.stdin.on('data', input => { if (input.trim() === 'stop') resolve(); }); process.stdin.resume(); });
+  process.stdin.pause();
+} finally { child.kill(); if (child.exitCode === null) await once(child, 'exit'); const resolved = path.resolve(directory); if (!resolved.startsWith(path.resolve(tmpdir()) + path.sep) || !path.basename(resolved).startsWith('friendly-booking-browser-')) throw new Error('Unexpected QA directory'); await rm(resolved, { recursive: true, force: true }); }

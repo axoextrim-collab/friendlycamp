@@ -1,0 +1,9 @@
+dialog:not([open]) { display: none !important; }
+.fc-modal-surface[open] { position: fixed; inset: 0; margin: 0; width: 100%; max-width: none; height: 100dvh; max-height: none; border: 0; }
+.fc-modal-surface::backdrop { background: transparent; }
+:is(button, a[href], input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid #9b6500 !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 2px #fff !important;
+}
+@media (forced-colors: active) { :is(button, a[href], input, select, textarea, summary, [tabindex]):focus-visible { outline-color: Highlight !important; box-shadow: none !important; } }

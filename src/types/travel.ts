@@ -1,0 +1,8 @@
+export const POLICY_KEYS = ['terms','privacy','cancellation','insurance','legal','faq','support'] as const;
+export type PolicyKey = typeof POLICY_KEYS[number];
+export const POLICY_TITLES:Record<PolicyKey,string>={terms:'قوانین و مقررات',privacy:'سیاست حفظ حریم خصوصی',cancellation:'شرایط لغو و استرداد',insurance:'اطلاعات بیمه',legal:'مجوزها و اطلاعات حقوقی',faq:'پرسش‌های متداول',support:'شکایت و پشتیبانی'};
+export const DIFFICULTY_LABELS:Record<string,string>={easy:'آسان',moderate:'متوسط',hard:'دشوار',very_hard:'بسیار دشوار'};
+export interface TravelDetails { leaderId?:string; difficulty:string;fitnessRequirements:string;equipment:string[];minAge:number|null;maxAge:number|null;ageConditions:string;medicalRestrictions:string;leaderName:string;leaderQualifications:string;leaderIssuer:string;leaderCredential:string;leaderSource:string;faqs:Array<{question:string;answer:string}>;insurance:{provider:string;policyNumber:string;coverage:string;exclusions:string;validFrom:string;validUntil:string;source:string}; }
+export interface AcceptedPolicy {kind:PolicyKey;title:string;revision:string;effectiveAt:string;body:string;}
+export interface TravelSnapshot extends TravelDetails { returnAt:string;returnPoint:string;cancellationDetails:string;tourRevision:string;policies:AcceptedPolicy[];seller:{name:string;registrationNumber?:string;address:string;phone:string;email:string}; }
+export const EMPTY_TRAVEL:TravelDetails={difficulty:'',fitnessRequirements:'',equipment:[],minAge:null,maxAge:null,ageConditions:'',medicalRestrictions:'',leaderName:'',leaderQualifications:'',leaderIssuer:'',leaderCredential:'',leaderSource:'',faqs:[],insurance:{provider:'',policyNumber:'',coverage:'',exclusions:'',validFrom:'',validUntil:'',source:''}};

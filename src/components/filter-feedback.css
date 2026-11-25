@@ -1,0 +1,27 @@
+.fc-filter-summary { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 14px 0; margin-block: 4px 16px; color: #365541; font-size: .9375rem; line-height: 1.9; }
+.fc-filter-summary > p { display: flex; align-items: flex-start; gap: 8px; margin: 0; flex: 1 1 240px; }
+.fc-filter-summary svg { flex-shrink: 0; margin-top: 5px; }
+.fc-filter-summary button svg { margin-top: 0; }
+.fc-filter-summary > div { display: flex; gap: 10px; flex-wrap: wrap; }
+.fc-filter-summary button, .fc-filter-feedback button, .camp-image-retry { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; min-width: 44px; padding: 9px 14px; border: 1px solid #b4c8b9; border-radius: 8px; background: #fff; color: #28533b; font-size: .875rem; line-height: 1.8; cursor: pointer; }
+.fc-filter-summary button:disabled { opacity: .5; cursor: default; }
+.fc-filter-results { min-width: 0; }
+.fc-filter-feedback { display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: 190px; padding: 28px 20px; border: 1px solid #d7e3d9; border-radius: 12px; background: #f7faf5; color: #35533e; text-align: center; }
+.fc-filter-feedback h3 { font-size: 1.125rem; font-weight: 600; line-height: 1.8; margin: 0; }
+.fc-filter-feedback p { font-size: 1rem; line-height: 1.9; max-width: 620px; margin: 0; }
+.fc-filter-feedback.is-error { background: #fff8f5; color: #813c2e; border-color: #e5c6bc; }
+.fc-filter-feedback.is-error button { color: #813c2e; border-color: #d3ab9e; }
+.fc-filter-empty-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+:is(.camp-filters, .camp-source-filter, .tc-filters, .iran-destinations-filters) button[aria-pressed="true"], .rt-interest-options > button[aria-pressed="true"] { color: #fff !important; background: #28543d !important; border-color: #28543d !important; box-shadow: inset 0 0 0 1px #28543d; }
+.nature-app .camp-filters button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid #ccd9cd; border-radius: 8px; padding: 9px 12px; min-height: 44px; }
+.camp-filters button::after { display: none; }
+:is(.tc-filters, .iran-destinations-filters) button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.camp-source-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-block: 14px 8px; }
+.camp-source-filter button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 8px 14px; border: 1px solid #c7d8c9; border-radius: 8px; background: #fff; color: #365541; font-size: .9375rem; }
+.camp-image-state { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; gap: 12px; padding: 20px; background: #e9efe7; color: #284f37; text-align: center; font-size: 1rem; line-height: 1.9; }
+.camp-image-state.is-error { background: #fff3ed; color: #813c2e; }
+.camp-image-state button { position: relative; z-index: 2; }
+.camp-gallery-card { position: relative; }
+.camp-storage-error { margin-block: 14px; }
+.sp-list-toolbar select[data-active="true"], .rt-constraints select[data-active="true"], .rt-sort select[data-active="true"] { background-color: #edf5eb; border-color: #28543d; color: #1e4b30; box-shadow: inset 0 0 0 1px #28543d; }
+@media (max-width: 767px) { .fc-filter-summary { align-items: stretch; font-size: .9375rem; } .fc-filter-summary > p { flex-basis: 100%; } .fc-filter-summary > div { width: 100%; } .fc-filter-summary button { flex: 1; } }

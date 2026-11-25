@@ -1,0 +1,108 @@
+.nature-app #destinations.iran-destinations {
+  width: min(1280px, calc(100% - 64px));
+  margin: 0 auto;
+  padding: 72px 8px 46px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  backdrop-filter: none;
+  scroll-margin-top: 95px;
+  color: #193f35;
+}
+.iran-destinations button { cursor: pointer; }
+.iran-destinations-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; }
+.iran-destinations-eyebrow { margin: 0 0 6px; color: #678373; font-size: .875rem; }
+.nature-app #destinations h2 { font-weight: 600; font-size: clamp(1.9rem, 3vw, 2.65rem); line-height: 1.6; letter-spacing: -.03em; }
+.iran-destinations h2 span { color: #a87943; }
+.iran-destinations-intro { margin: 10px 0 0; color: #61776a; font-size: 1rem; line-height: 1.9; }
+.iran-destinations-navigation { display: flex; align-items: center; gap: 22px; flex-shrink: 0; }
+.iran-destinations-navigation > span { color: #738679; font-size: max(var(--fc-text-floor, 0px), .8125rem); }
+.iran-destinations-navigation > div { display: flex; gap: 8px; }
+.iran-destinations-navigation button { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid #cbd9ce; border-radius: 50%; background: #fff9; color: #28533d; transition: background .2s, color .2s; }
+.iran-destinations-navigation button:hover:not(:disabled) { background: #234f3b; border-color: #234f3b; color: white; }
+.iran-destinations-navigation button:disabled { opacity: .35; cursor: default; }
+.iran-destinations-filters { display: flex; flex-wrap: wrap; gap: 8px; padding-block: 26px 24px; }
+.iran-destinations-filters button { display: inline-flex; align-items: center; gap: 8px; padding: 9px 17px; border: 1px solid #d8e3d9; border-radius: 99px; color: #5d7465; font-size: .875rem; background: #ffffff73; transition: color .2s, background .2s, border-color .2s; }
+.iran-destinations-filters button:hover { border-color: #8eaa94; color: #234d38; }
+.iran-destinations-filters button[aria-pressed="true"] { color: #fff; background: #264f3c; border-color: #264f3c; }
+.iran-destinations-track { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 66px) / 4); align-items: stretch; gap: 22px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-block: 2px 12px; overscroll-behavior-x: contain; }
+.iran-destinations-track::-webkit-scrollbar { display: none; }
+.iran-destinations-track.is-looping { scroll-snap-type: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.iran-destinations-track.is-looping .iran-destination-open { cursor: grab; }
+.iran-destinations-track.is-dragging, .iran-destinations-track.is-dragging .iran-destination-open { cursor: grabbing; }
+.iran-destinations-track.is-dragging .iran-destination-image img { transform: none; }
+.iran-destinations-track.is-expanded { grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: visible; scroll-snap-type: none; }
+.iran-destinations-expand { display: flex; justify-content: center; margin-block: 22px 4px; }
+.iran-destinations-expand button { padding: 10px 24px; border: 1px solid #c9d9ca; border-radius: 7px; color: #315b42; background: #ffffff75; font-size: .875rem; transition: background .2s; }
+.iran-destinations-expand button:hover { background: #e2ecde; }
+.nature-app #destinations .iran-destination-card { position: relative; height: 360px; border: 1px solid #dce6db; border-radius: 14px; overflow: hidden; background: #dae5db; scroll-snap-align: start; min-width: 0; box-shadow: none; transform: none; transition: border-color .25s, box-shadow .25s; }
+.nature-app #destinations .iran-destination-card:hover { border-color: #9db79f; box-shadow: 0 7px 20px #244e3210; transform: none; }
+.iran-destination-open { position: relative; display: block; width: 100%; height: 100%; text-align: start; }
+.iran-destination-image { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; background: #dae5db; }
+.iran-destination-image::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, #10251a12, transparent 38%, transparent 48%, #10251ac7); pointer-events: none; }
+.iran-destination-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .65s cubic-bezier(.22,1,.36,1); }
+.iran-destination-open:hover .iran-destination-image img, .iran-destination-open:focus-visible .iran-destination-image img { transform: scale(1.035); }
+.iran-destination-city { position: absolute; top: 16px; right: 16px; display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 99px; background: #fffffff0; color: #2c5540; font-size: .875rem; }
+.iran-destination-copy { position: absolute; bottom: 0; inset-inline: 0; padding: 45px 20px 22px; }
+.iran-destination-category { margin: 0 0 5px; color: #8b724f; font-size: max(var(--fc-text-floor, 0px), .8125rem); }
+.nature-app #destinations .iran-destination-card h3 { color: #fff; font-size: 1.35rem; font-weight: 600; line-height: 1.7; letter-spacing: -.025em; text-shadow: 0 2px 12px #07190f66; }
+.iran-destinations-footnote { display: flex; align-items: start; justify-content: space-between; gap: 18px; padding-top: 16px; border-top: 1px solid #d8e3d7; margin-top: 12px; color: #748174; font-size: max(var(--fc-text-floor, 0px), .8125rem); }
+.iran-destinations-footnote > p { display: flex; align-items: center; gap: 7px; margin: 0; }
+.iran-destinations-footnote svg { flex-shrink: 0; }
+.iran-destinations-credits { flex-shrink: 0; text-align: end; }
+.iran-destinations-credits summary { cursor: pointer; padding: 0 4px 5px; }
+.iran-destinations-credits > div { padding-top: 8px; font-size: max(var(--fc-text-floor, 0px), .75rem); max-width: 380px; max-height: 280px; overflow-y: auto; }
+.iran-destinations-credits p { margin-bottom: 8px; }
+.iran-destinations-credits p > span { display: block; }
+.iran-destinations-credits a { text-decoration: underline; text-underline-offset: 3px; margin-inline-start: 8px; }
+.iran-destination-dialog { position: fixed; inset: 0; margin: auto; width: min(860px, calc(100% - 32px)); max-height: min(90dvh, 800px); padding: 0; border: 0; border-radius: 18px; background: #fff; color: #254336; overflow-y: auto; font-family: var(--fc-body-font, 'Vazirmatn', sans-serif); }
+.iran-destination-dialog::backdrop { background: #102b24b8; backdrop-filter: blur(5px); }
+.iran-destination-dialog-inner { position: relative; display: grid; grid-template-columns: .9fr 1.1fr; min-height: 520px; }
+.iran-destination-close { position: absolute; left: 14px; top: 14px; z-index: 2; width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid #dce6dd; border-radius: 50%; background: #fff; cursor: pointer; color: #244b35; }
+.iran-destination-dialog-image { min-height: 100%; background: #e3eae2; }
+.iran-destination-dialog-image img { width: 100%; height: 100%; object-fit: cover; }
+.iran-destination-dialog-copy { padding: 44px 32px 28px; }
+.nature-app .iran-destination-dialog h2 { font-size: 1.9rem; font-weight: 600; line-height: 1.7; margin-bottom: 7px; }
+.iran-destination-dialog-location { display: flex; align-items: center; gap: 7px; font-size: .875rem; color: #718171; }
+.iran-destination-dialog-description { margin-block: 22px; line-height: 2; font-size: 1rem; color: #536d5a; }
+.nature-app .iran-destination-dialog h3 { font-size: 1rem; font-weight: 600; }
+.iran-destination-dialog ul { list-style: none; padding: 0; margin-block: 12px 24px; }
+.iran-destination-dialog li { display: flex; align-items: center; gap: 8px; padding-block: 5px; color: #617765; font-size: .875rem; }
+.iran-destination-dialog li svg { flex-shrink: 0; color: #7c9a71; }
+.iran-destination-dialog-note { line-height: 1.9; font-size: .875rem; color: #748174; padding-top: 18px; border-top: 1px solid #e6ece3; }
+.iran-destination-inquiry { width: 100%; padding: 12px 18px; margin-top: 18px; border: 0; border-radius: 7px; color: #fff; background: #28533b; font-size: .9375rem; cursor: pointer; }
+.iran-destination-inquiry:hover { background: #1c3e2a; }
+.iran-destination-dialog-credit { margin-top: 17px; font-size: max(var(--fc-text-floor, 0px), .75rem); color: #7a857a; line-height: 1.9; }
+.iran-destination-dialog-credit a { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 1050px) { .iran-destinations-track { grid-auto-columns: calc((100% - 44px) / 3); } .iran-destinations-track.is-expanded { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+  .nature-app #destinations.iran-destinations { width: calc(100% - 40px); margin-inline: auto; padding: 40px 0 32px; }
+  .iran-destinations-heading { align-items: start; gap: 16px; }
+  .iran-destinations-navigation { padding-top: 12px; }
+  .iran-destinations-navigation > span { display: none; }
+  .iran-destinations-intro { max-width: 350px; }
+  .iran-destinations-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-block: 23px; }
+  .iran-destinations-filters button { flex-shrink: 0; padding: 8px 13px; }
+  .iran-destinations-track { grid-auto-columns: calc((100% - 18px) / 2); gap: 18px; }
+  .iran-destinations-track.is-expanded { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .iran-destination-copy { padding: 45px 18px 20px; }
+  .iran-destination-dialog-inner { grid-template-columns: 1fr; }
+  .iran-destination-dialog-image { height: 230px; min-height: 0; }
+  .iran-destination-dialog-copy { padding: 25px; }
+  .iran-destination-dialog-close { left: 12px; top: 12px; }
+  .iran-destinations-footnote { flex-wrap: wrap; gap: 10px; }
+  .iran-destinations-credits { text-align: start; }
+}
+@media (max-width: 480px) {
+  .iran-destinations-heading { flex-wrap: wrap; }
+  .iran-destinations-navigation { width: 100%; justify-content: space-between; padding-top: 0; }
+  .iran-destinations-navigation > span { display: block; }
+  .iran-destinations-track { grid-auto-columns: 86%; gap: 16px; }
+  .iran-destinations-track.is-expanded { grid-template-columns: 1fr; }
+  .iran-destination-dialog { width: calc(100% - 24px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .iran-destination-image img { transition: none; }
+  .iran-destination-open:hover .iran-destination-image img, .iran-destination-open:focus-visible .iran-destination-image img { transform: none; }
+}

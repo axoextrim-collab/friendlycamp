@@ -1,151 +1,62 @@
+import { ManagedText, ManagedAnchor, siteText } from '../cms/PublicContent';
 import React, { useState } from 'react';
+import { ChevronRight, ChevronLeft, MapPin, Leaf, Trees, Waves, Mountain, Droplets, Compass, Pause, Play } from 'lucide-react';
 import { POPULAR_DESTINATIONS } from '../data/mockData';
-import { Destination } from '../types';
-import { ChevronRight, ChevronLeft, MapPin, Compass, ArrowUpLeft, Palette, Eye, Sparkles, Sun } from 'lucide-react';
+import type { Destination } from '../types';
+import { useDestinationCarousel } from '../hooks/useDestinationCarousel';
+import './destinations.css';
 
 interface PopularDestinationsProps {
   onSelectDestination: (destination: Destination) => void;
 }
 
-type FilterMode = 'natural' | 'sepia' | 'grayscale' | 'warm';
+const FILTERS = [
+  { id: 'all', label: 'همه مقصدها', icon: Compass },
+  { id: 'forest', label: 'جنگل و ییلاق', icon: Trees },
+  { id: 'coast', label: 'دریا و جزیره', icon: Waves },
+  { id: 'desert', label: 'کویر', icon: Mountain },
+  { id: 'water', label: 'آبشار و دریاچه', icon: Droplets },
+  { id: 'mountain', label: 'کوهستان و روستا', icon: Mountain },
+] as const;
 
-export const PopularDestinations: React.FC<PopularDestinationsProps> = ({
-  onSelectDestination
-}) => {
-  const [startIndex, setStartIndex] = useState(0);
-  const [activeFilter, setActiveFilter] = useState<FilterMode>('natural');
-
-  const visibleCount = 4;
-  const total = POPULAR_DESTINATIONS.length;
-
-  const nextSlide = () => {
-    setStartIndex((prev) => (prev + 1) % total);
-  };
-
-  const prevSlide = () => {
-    setStartIndex((prev) => (prev - 1 + total) % total);
-  };
-
-  // Reorder items according to startIndex for smooth circular sliding
-  const displayedDestinations = [
-    ...POPULAR_DESTINATIONS.slice(startIndex),
-    ...POPULAR_DESTINATIONS.slice(0, startIndex)
-  ].slice(0, visibleCount);
-
-  // CSS Filter styles
-  const getFilterStyle = (): React.CSSProperties => {
-    switch (activeFilter) {
-      case 'sepia':
-        return { filter: 'sepia(0.8) contrast(1.1) saturate(1.2)' };
-      case 'grayscale':
-        return { filter: 'grayscale(1) contrast(1.15) brightness(0.95)' };
-      case 'warm':
-        return { filter: 'hue-rotate(-20deg) saturate(1.4) contrast(1.05)' };
-      case 'natural':
-      default:
-        return { filter: 'none' };
-    }
-  };
-
-  const filterButtons: { id: FilterMode; label: string; icon: React.ReactNode }[] = [
-    { id: 'natural', label: 'طبیعی (Natural)', icon: <Eye size={14} /> },
-    { id: 'sepia', label: 'سپیا (Sepia)', icon: <Palette size={14} /> },
-    { id: 'grayscale', label: 'سیاه و سفید (B&W)', icon: <Sparkles size={14} /> },
-    { id: 'warm', label: 'غروب طلایی (Warm)', icon: <Sun size={14} /> }
-  ];
+export const PopularDestinations: React.FC<PopularDestinationsProps> = ({ onSelectDestination }) => {
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]['id']>('all');
+  const [showAll, setShowAll] = useState(false);
+  const destinations = POPULAR_DESTINATIONS.filter(item => filter === 'all' || item.category === filter);
+  const carousel = useDestinationCarousel(destinations.length, showAll, filter);
+  const renderContent = (item: Destination) => <>
+    <div className="iran-destination-image"><img src={item.image} alt={siteText(item.title)} width="640" height="800" loading="lazy" decoding="async" draggable={false} data-motion="off" style={{ objectPosition: item.imagePosition }} /></div>
+    <span className="iran-destination-city"><MapPin size={14} aria-hidden="true" /><ManagedText value={item.city || item.province}/></span>
+    <div className="iran-destination-copy"><h3><ManagedText value={item.title}/></h3></div>
+  </>;
 
   return (
-    <section id="destinations" className="py-16 px-4 md:px-8 max-w-7xl mx-auto">
-      
-      {/* Section Header */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
-        <div className="text-center md:text-right">
-          <h2 className="text-3xl md:text-5xl font-black text-[#14382c] mb-3">
-            مقصد <span className="text-amber-500">محبوب</span>
-          </h2>
-          <p className="text-slate-600 text-sm md:text-base max-w-2xl font-medium">
-            مقاصدی که ارزش گشت و گذار دارند! در اینجا چند مکان محبوب را معرفی می‌کنیم
-          </p>
-        </div>
-
-        {/* Slider Navigation Buttons */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={prevSlide}
-            className="w-12 h-12 rounded-full border-2 border-[#14382c] text-[#14382c] hover:bg-[#14382c] hover:text-white transition flex items-center justify-center cursor-pointer shadow-sm"
-            aria-label="قبلی"
-            id="destinations-prev-btn"
-          >
-            <ChevronRight size={22} />
-          </button>
-          <button
-            onClick={nextSlide}
-            className="w-12 h-12 rounded-full bg-[#14382c] text-white hover:bg-[#f59e0b] hover:text-slate-950 transition flex items-center justify-center cursor-pointer shadow-md"
-            aria-label="بعدی"
-            id="destinations-next-btn"
-          >
-            <ChevronLeft size={22} />
-          </button>
-        </div>
+    <section id="destinations" className="iran-destinations" aria-labelledby="destinations-heading">
+      <div className="iran-destinations-heading">
+        <div><p className="iran-destinations-eyebrow"><ManagedText value={"ایران، از نزدیک"}/></p><h2 id="destinations-heading"><ManagedText value={"مقصد "}/><span><ManagedText value={"محبوب"}/></span></h2><p className="iran-destinations-intro"><ManagedText value={"از سبزی ییلاق تا آبی دریا؛ گوشه‌های بکر ایران را کشف کن."}/></p></div>
+        <div className="iran-destinations-navigation"><span><ManagedText value={destinations.length.toLocaleString('fa-IR')}/><ManagedText value={" مقصد برای کشف"}/></span><div>
+          <button type="button" id="destinations-prev-btn" onClick={() => carousel.scroll('previous')} disabled={showAll || !carousel.looping} aria-label={siteText("مقصدهای قبلی")} aria-controls="iran-destinations-track"><ChevronRight size={20} /></button>
+          <button type="button" onClick={carousel.togglePaused} disabled={showAll || !carousel.looping || carousel.reducedMotion} aria-label={siteText(carousel.paused ? 'پخش خودکار مقصدها' : 'توقف حرکت خودکار مقصدها')} aria-pressed={carousel.paused} aria-controls="iran-destinations-track">{carousel.paused ? <Play size={17} /> : <Pause size={17} />}</button>
+          <button type="button" id="destinations-next-btn" onClick={() => carousel.scroll('next')} disabled={showAll || !carousel.looping} aria-label={siteText("مقصدهای بعدی")} aria-controls="iran-destinations-track"><ChevronLeft size={20} /></button>
+        </div></div>
       </div>
 
+      <div className="iran-destinations-filters" role="group" aria-label={siteText("نوع طبیعت مقصد")}>
+        {FILTERS.map(({ id, label, icon: Icon }) => <button type="button" key={id} onClick={() => { setFilter(id); setShowAll(false); }} aria-pressed={filter === id}><Icon size={17} strokeWidth={1.6} aria-hidden="true" /><ManagedText value={label}/></button>)}
+      </div>
+      <span role="status" className="sr-only"><ManagedText value={destinations.length.toLocaleString('fa-IR')}/><ManagedText value={" مقصد در این دسته"}/></span>
 
+      <div id="iran-destinations-track" className={`iran-destinations-track${showAll ? ' is-expanded' : ''}${carousel.looping && !showAll ? ' is-looping' : ''}${carousel.dragging ? ' is-dragging' : ''}`} ref={carousel.track} {...carousel.trackProps} dir="rtl" aria-label={siteText("مقصدهای گردشگری ایران")}>
+        {destinations.map(item => <article key={item.id} className="iran-destination-card" data-destination-id={item.id}>
+          <button type="button" className="iran-destination-open" onClick={() => onSelectDestination(item)} aria-label={siteText(`کشف ${item.title}`)}><ManagedText value={renderContent(item)}/></button>
+        </article>)}
+        {carousel.looping && !showAll && destinations.map(item => <article key={`copy-${item.id}`} className="iran-destination-card" data-destination-copy={item.id} aria-hidden="true" onClick={() => onSelectDestination(item)}><div className="iran-destination-open"><ManagedText value={renderContent(item)}/></div></article>)}
+      </div>
 
-      {/* Destinations Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {displayedDestinations.map((item) => (
-          <div
-            key={item.id}
-            onClick={() => onSelectDestination(item)}
-            className="group relative h-[380px] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-slate-100 bg-white flex flex-col justify-end"
-          >
-            {/* Card Background Image with CSS Filter Toggle applied */}
-            <img
-              src={item.image}
-              alt={item.title}
-              style={getFilterStyle()}
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
-            />
+      {destinations.length > 4 && <div className="iran-destinations-expand"><button type="button" onClick={() => setShowAll(value => !value)} aria-expanded={showAll} aria-controls="iran-destinations-track"><ManagedText value={showAll ? 'نمایش به صورت اسلایدر' : `دیدن همهٔ ${destinations.length.toLocaleString('fa-IR')} مقصد`}/></button></div>}
 
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent" />
-
-            {/* Country & Weather Badge */}
-            <div className="absolute top-4 right-4 flex items-center gap-1.5">
-              <div className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-[#004e5a] shadow-md flex items-center gap-1">
-                <MapPin size={13} className="text-amber-500" />
-                <span>{item.country}</span>
-              </div>
-              <div className="bg-slate-950/80 backdrop-blur-md text-[#84cc16] px-2.5 py-1 rounded-full text-[10px] font-mono font-bold shadow-md border border-white/10">
-                🌧️ ۱۸°C
-              </div>
-            </div>
-
-            {/* Rating badge */}
-            <div className="absolute top-4 left-4 bg-amber-500/90 backdrop-blur-md text-slate-950 px-2.5 py-1 rounded-full text-[11px] font-black shadow-md">
-              ★ {item.rating || 4.9}
-            </div>
-
-            {/* Card Bottom Content */}
-            <div className="relative z-10 p-6 text-white flex flex-col gap-2">
-              <span className="text-xs font-medium text-amber-300 flex items-center gap-1">
-                <Compass size={14} />
-                <span>{item.toursCount} تور فعال</span>
-              </span>
-
-              <h3 className="text-xl font-bold group-hover:text-[#a3e635] transition duration-200">
-                {item.title}
-              </h3>
-
-              <div className="flex items-center justify-between pt-2 border-t border-white/20 mt-1">
-                <span className="text-xs text-white/80 font-medium">از {item.price}</span>
-                <span className="w-8 h-8 rounded-full bg-white/20 group-hover:bg-[#84cc16] group-hover:text-[#064e3b] transition flex items-center justify-center text-white">
-                  <ArrowUpLeft size={16} />
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="iran-destinations-footnote"><p><Leaf size={16} strokeWidth={1.5} aria-hidden="true" /><ManagedText value={"مهمان طبیعتیم؛ زیبایی‌اش را برای بعدی‌ها نگه داریم."}/></p>
+        <details className="iran-destinations-credits"><summary><ManagedText value={"اعتبار تصاویر"}/></summary><div>{POPULAR_DESTINATIONS.map(item => item.imageCredit && <p key={item.id}><span><ManagedText value={item.title}/> · <bdi><ManagedText value={item.imageCredit.author}/></bdi></span><ManagedAnchor href={item.imageCredit.source} target="_blank" rel="noreferrer"><ManagedText value={"منبع"}/></ManagedAnchor><ManagedAnchor href={item.imageCredit.licenseUrl} target="_blank" rel="noreferrer"><bdi><ManagedText value={item.imageCredit.license}/></bdi></ManagedAnchor></p>)}<small><ManagedText value={"تصاویر برای وب بهینه شده‌اند و متناسب با کارت برش می‌خورند."}/></small></div></details>
       </div>
     </section>
   );

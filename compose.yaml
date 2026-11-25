@@ -1,0 +1,53 @@
+name: friendlycamp
+services:
+  app:
+    image: friendlycamp-local:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    init: true
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+      - path: .env.local
+        required: false
+      - path: .docker/local.env
+        required: true
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      TZ: Asia/Tehran
+      PUBLIC_SITE_URL: http://localhost:3001
+      ADMIN_ORIGINS: http://localhost:3001
+      BOOKING_PAYMENT_MODE: sandbox
+      BOOKING_FILE_PERMISSIONS: host
+      DATABASE_BACKEND: sqlite
+      PAYMENT_HTTP_URL: ""
+      PAYMENT_API_TOKEN: ""
+      SMS_HTTP_URL: ""
+      SMS_API_TOKEN: ""
+    ports:
+      - "127.0.0.1:3001:3000"
+    volumes:
+      - type: bind
+        source: ./data
+        target: /app/data
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./public/uploads
+        target: /app/public/uploads
+        bind:
+          create_host_path: false
+    stop_grace_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

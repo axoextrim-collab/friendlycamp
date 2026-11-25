@@ -1,0 +1,10 @@
+{
+  "serviceId": "srv-dajppljm8hqs7398q9v0",
+  "projectId": "prj-dajpplfqj5pc73ek76j0",
+  "projectUrl": "https://dashboard.render.com/project/prj-dajpplfqj5pc73ek76j0",
+  "dashboardUrl": "https://dashboard.render.com/web/srv-dajppljm8hqs7398q9v0",
+  "repository": "https://github.com/axoextrim-collab/friendlycamp.git",
+  "requestedPlan": "free",
+  "createNewService": false,
+  "preserveExistingRuntimeAndRegion": true
+}

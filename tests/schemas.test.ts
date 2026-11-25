@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { aiSchema, loginSchema, registerSchema } from '../server/schemas';
+import { loginSchema, registerSchema } from '../server/schemas';
 
 test('registration rejects weak passwords and invalid Iranian phones', () => {
   assert.equal(registerSchema.safeParse({ fullName: 'کاربر تست', phone: '123', email: 'test@example.com', password: 'weak', agreeTerms: true }).success, false);
@@ -11,8 +11,8 @@ test('registration accepts a valid payload and strips an injected admin role', (
   assert.equal('role' in result, false);
 });
 
-test('login and AI prompts enforce bounded inputs', () => {
+test('login enforces bounded inputs', () => {
   assert.equal(loginSchema.safeParse({ identifier: 'test@example.com', password: 'x', remember: true }).success, true);
-  assert.equal(aiSchema.safeParse({ contentType: 'blog', tourName: 'دماوند', additionalPrompt: 'x'.repeat(2001) }).success, false);
-  assert.equal(aiSchema.safeParse({ contentType: 'unknown', tourName: 'دماوند' }).success, false);
+  assert.equal(loginSchema.safeParse({ identifier: 'a'.repeat(255), password: 'x' }).success, false);
+  assert.equal(loginSchema.safeParse({ identifier: 'test@example.com', password: 'x'.repeat(129) }).success, false);
 });

@@ -7,7 +7,7 @@ import { useEffect } from 'react';
  */
 export function useMotionImages() {
   useEffect(() => {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce), (max-width: 767px)');
     const observed = new WeakSet<HTMLImageElement>();
 
     const enhance = (image: HTMLImageElement) => {
@@ -15,7 +15,8 @@ export function useMotionImages() {
       observed.add(image);
       image.loading = image.closest('#hero') ? 'eager' : 'lazy';
       image.decoding = 'async';
-      if (reducedMotion.matches || localStorage.getItem('fc-motion-enabled') === 'false') return;
+      let motionEnabled=false;try{motionEnabled=localStorage.getItem('fc-motion-enabled')==='true';}catch{/* Motion stays off when browser storage is unavailable. */}
+      if (reducedMotion.matches || !motionEnabled) return;
       image.classList.add('nature-motion-image');
     };
 

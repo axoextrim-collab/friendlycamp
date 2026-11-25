@@ -1,0 +1,130 @@
+.nature-app > main > #services.club-services { margin: 0; max-width: none; padding: 80px 0 60px; border: 0; border-radius: 0; background: #fff; box-shadow: none; backdrop-filter: none; color: #294536; scroll-margin-top: 90px; }
+.cs-inner { width: min(1264px, calc(100% - 80px)); margin-inline: auto; }
+.cs-heading { display: flex; justify-content: space-between; align-items: end; gap: 40px; margin-bottom: 38px; }
+.cs-eyebrow { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-size: .875rem; color: #607451; }
+.cs-eyebrow::before { content: ''; width: 23px; height: 2px; background: #8c9e65; }
+.nature-app #services #club-services-title { margin: 0; font-size: clamp(2rem, 3.35vw, 2.8rem); font-weight: 500; line-height: 1.65; letter-spacing: -.045em; color: #234431; text-wrap: initial; }
+#club-services-title > span { color: #7b8c55; }
+.cs-intro { margin: 0 0 10px; font-size: 1rem; line-height: 2.1; color: #6b7865; }
+.cs-board { display: grid; grid-template-columns: 300px minmax(0, 1fr); border: 1px solid #e0e7d9; border-radius: 14px; overflow: hidden; }
+.cs-selector { display: flex; flex-direction: column; padding: 24px 16px 0; background: #f7f9f3; border-inline-end: 1px solid #e1e8da; }
+.cs-selector-label { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 10px 17px; font-size: max(var(--fc-text-floor, 0px), .8125rem); color: #748266; }
+.cs-mobile-hint { display: none; font-size: max(var(--fc-text-floor, 0px), .75rem); white-space: nowrap; color: #71805f; }
+.cs-tabs { display: flex; flex-direction: column; gap: 5px; }
+.cs-tab { position: relative; display: flex; align-items: center; gap: 13px; width: 100%; min-height: 80px; padding: 15px 12px; border: 1px solid transparent; border-radius: 7px; background: transparent; text-align: start; color: #63765b; cursor: pointer; transition: background .2s, border-color .2s, color .2s; }
+.cs-tab:hover { background: #eef3e7; }
+.cs-tab[aria-selected=true] { background: #fff; border-color: #dde6d1; box-shadow: 0 3px 10px -7px #2f4c2a33; color: #345931; }
+.cs-tab[aria-selected=true]::before { content: ''; position: absolute; inset-inline-start: -17px; top: 21px; bottom: 21px; width: 3px; border-radius: 3px; background: #71904e; }
+.cs-tab-icon { display: grid; place-items: center; color: #7b8e68; flex-shrink: 0; }
+.cs-tab[aria-selected=true] .cs-tab-icon { color: #527442; }
+.cs-tab-copy { display: flex; flex: 1; flex-direction: column; gap: 5px; min-width: 0; }
+.cs-tab-copy strong { font-size: 1rem; font-weight: 500; line-height: 1.8; }
+.cs-tab-copy small { font-size: max(var(--fc-text-floor, 0px), .75rem); color: #79856e; line-height: 1.8; }
+.cs-tab-indicator { display: grid; place-items: center; width: 19px; height: 19px; color: #849574; flex-shrink: 0; }
+.cs-tab-indicator > span { position: relative; display: block; width: 9px; height: 1px; background: currentColor; }
+.cs-tab-indicator > span::after { content: ''; position: absolute; left: 4px; top: -4px; width: 1px; height: 9px; background: currentColor; transition: transform .2s; }
+.cs-tab[aria-selected=true] .cs-tab-indicator > span::after { transform: rotate(90deg); }
+.cs-selector-footnote { display: flex; align-items: center; gap: 7px; padding: 22px 6px; margin: auto 0 0; color: #7c886e; font-size: max(var(--fc-text-floor, 0px), .75rem); line-height: 1.8; }
+.cs-selector-footnote svg { flex-shrink: 0; }
+.cs-panel { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(220px, .9fr); min-width: 0; background: #fff; }
+.cs-panel:focus-visible { outline: 2px solid #789157; outline-offset: -4px; }
+.cs-service-copy { display: flex; flex-direction: column; min-width: 0; min-height: 615px; padding: 35px 30px 28px; animation: cs-reveal .28s ease-out; }
+.cs-service-tag { display: flex; align-items: center; gap: 7px; margin: 0 0 15px; color: #7a8d5b; font-size: max(var(--fc-text-floor, 0px), .8125rem); }
+.nature-app #services .cs-service-copy h3 { margin: 0; font-size: clamp(1.4rem, 2.05vw, 1.7rem); font-weight: 500; line-height: 1.9; color: #294932; letter-spacing: -.03em; }
+.cs-description { margin: 14px 0 0; color: #6a7962; font-size: 1rem; line-height: 2; }
+.cs-service-details { display: grid; gap: 19px; list-style: none; padding: 25px 0; margin: 23px 0 0; border-top: 1px solid #e7ecdf; }
+.cs-service-details > li { display: flex; align-items: start; gap: 10px; }
+.cs-service-details > li > svg { flex-shrink: 0; margin-top: 5px; color: #779155; }
+.cs-service-details strong { display: block; font-weight: 500; font-size: .9375rem; line-height: 1.9; color: #3d5a39; }
+.cs-service-details p { font-size: .875rem; line-height: 1.9; margin: 3px 0 0; color: #78816d; }
+.cs-service-note { margin: auto 0 0; padding-top: 16px; border-top: 1px solid #e7ecdf; color: #718164; font-size: max(var(--fc-text-floor, 0px), .8125rem); line-height: 1.95; }
+.cs-service-visual { margin: 0; position: relative; min-width: 0; min-height: 100%; overflow: hidden; background: #34503b; animation: cs-reveal .3s ease-out; }
+.cs-service-visual > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cs-service-visual::after { content: ''; position: absolute; inset: 50% 0 0; background: linear-gradient(transparent, #0e291abf); pointer-events: none; }
+.cs-service-visual figcaption { position: absolute; z-index: 1; bottom: 25px; inset-inline: 22px; color: #fff; }
+.cs-photo-caption { display: block; font-size: .9375rem; font-weight: 400; text-shadow: 0 1px 8px #0d2114b3; line-height: 1.8; }
+.cs-photo-credit { width: max-content; max-width: 100%; margin-top: 12px; font-size: max(var(--fc-text-floor, 0px), .75rem); }
+.cs-photo-credit summary { cursor: pointer; color: #eef4e7; text-underline-offset: 4px; }
+.cs-photo-credit summary:hover { text-decoration: underline; }
+.cs-photo-credit > div { position: absolute; bottom: 30px; inset-inline: 0; display: grid; gap: 9px; padding: 14px; border: 1px solid #ffffff25; border-radius: 5px; background: #1a372af2; backdrop-filter: blur(7px); font-size: max(var(--fc-text-floor, 0px), .75rem); line-height: 1.8; }
+.cs-photo-credit > div > span { color: #c8d8bb; }
+.cs-photo-credit a { text-decoration: underline; text-underline-offset: 4px; }
+.cs-contact-strip { display: flex; align-items: center; justify-content: space-between; gap: 26px; padding: 28px 0 0; margin-top: 27px; border-top: 1px solid #e6ebdd; }
+.cs-contact-strip > div:first-child { display: flex; align-items: center; gap: 16px; }
+.cs-contact-icon { display: grid; place-items: center; flex-shrink: 0; color: #6e8556; }
+.nature-app #services .cs-contact-strip h3 { font-size: 1.125rem; font-weight: 500; color: #375633; margin: 0; line-height: 1.9; }
+.cs-contact-strip p { margin: 3px 0 0; font-size: .875rem; line-height: 1.9; color: #78836f; }
+.cs-contact-actions { display: flex; align-items: center; gap: 22px; flex-shrink: 0; }
+.cs-contact-actions a { display: flex; align-items: center; gap: 8px; font-size: .875rem; color: #657956; white-space: nowrap; }
+.cs-contact-actions button { cursor: pointer; padding: 12px 20px; background: #284d36; border: 1px solid #284d36; border-radius: 6px; color: #fff; font-size: .875rem; transition: background .2s; white-space: nowrap; }
+.cs-contact-actions button:hover { background: #3b6041; }
+.club-services button:focus-visible, .club-services a:focus-visible, .club-services summary:focus-visible { outline: 2px solid #799458; outline-offset: 4px; }
+@keyframes cs-reveal { from { opacity: .4; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@media (max-width: 1150px) {
+  .cs-inner { width: calc(100% - 48px); }
+  .cs-board { grid-template-columns: 275px minmax(0, 1fr); }
+  .cs-service-copy { padding-inline: 24px; }
+  .cs-panel { grid-template-columns: minmax(0, 1.35fr) minmax(190px, .8fr); }
+  .cs-contact-strip { align-items: start; }
+  .cs-contact-actions { gap: 15px; }
+  .cs-heading { align-items: start; }
+  .cs-intro { max-width: 320px; padding-top: 38px; }
+}
+@media (max-width: 1050px) {
+  .cs-board { display: block; }
+  .cs-selector { padding: 20px 20px 0; border-inline-end: 0; border-bottom: 1px solid #e0e7d9; }
+  .cs-selector-label { margin-inline: 0; }
+  .cs-mobile-hint { display: inline; }
+  .cs-tabs { flex-direction: row; gap: 9px; overflow-x: auto; scrollbar-width: thin; scrollbar-color: #ccd8bd transparent; padding: 4px 3px 16px; margin: -4px -3px 0; scroll-snap-type: x proximity; }
+  .cs-tab { flex-direction: column; align-items: start; justify-content: start; gap: 8px; width: 164px; flex: 0 0 164px; min-height: 97px; padding: 12px; scroll-snap-align: start; }
+  .cs-tab-copy { flex: initial; }
+  .cs-tab-copy strong { font-size: .9375rem; }
+  .cs-tab-copy small { display: none; }
+  .cs-tab-indicator { position: absolute; top: 14px; inset-inline-end: 10px; }
+  .cs-tab[aria-selected=true]::before { inset-inline: 14px; bottom: -1px; top: auto; width: auto; height: 2px; }
+  .cs-selector-footnote { display: none; }
+  .cs-panel { grid-template-columns: minmax(0, 1.1fr) minmax(240px, 1fr); }
+  .cs-service-copy { min-height: 580px; padding: 30px; }
+  .cs-contact-strip { flex-wrap: wrap; }
+  .cs-contact-actions { margin-inline-start: auto; }
+}
+@media (max-width: 760px) {
+  .nature-app > main > #services.club-services { padding-block: 48px 35px; }
+  .cs-inner { width: calc(100% - 40px); }
+  .cs-heading { flex-direction: column; gap: 13px; margin-bottom: 28px; }
+  .cs-intro { max-width: none; padding-top: 0; margin: 0; font-size: .9375rem; line-height: 2.1; }
+  .cs-desktop-break { display: none; }
+  .cs-eyebrow { font-size: max(var(--fc-text-floor, 0px), .8125rem); }
+  .cs-selector { padding: 17px 16px 0; }
+  .cs-selector-label { font-size: max(var(--fc-text-floor, 0px), .8125rem); margin-bottom: 14px; }
+  .cs-tabs { padding-bottom: 17px; }
+  .cs-tab { width: 174px; flex-basis: 174px; min-height: 89px; }
+  .cs-panel { display: flex; flex-direction: column; }
+  .cs-service-visual { order: -1; min-height: 0; height: 260px; flex-shrink: 0; }
+  .cs-service-visual > img { object-position: center 60% !important; }
+  .cs-visual-experience > img { object-position: center 83% !important; }
+  .cs-visual-guides > img { object-position: center 65% !important; }
+  .cs-visual-cooking > img { object-position: center 55% !important; }
+  .cs-service-visual figcaption { bottom: 17px; inset-inline: 20px; }
+  .cs-photo-caption { font-size: .875rem; }
+  .cs-photo-credit { margin-top: 8px; }
+  .cs-service-copy { min-height: 0; padding: 25px 22px; }
+  .nature-app #services .cs-service-copy h3 { font-size: 1.5rem; line-height: 1.9; }
+  .cs-description { margin-top: 12px; }
+  .cs-service-details { gap: 19px; margin-top: 23px; padding-block: 23px; }
+  .cs-service-note { font-size: max(var(--fc-text-floor, 0px), .8125rem); }
+  .cs-contact-strip { gap: 20px; margin-top: 24px; padding-top: 23px; }
+  .cs-contact-strip > div:first-child { align-items: start; gap: 12px; }
+  .cs-contact-icon { padding-top: 5px; }
+  .cs-contact-strip p { font-size: .875rem; }
+  .cs-contact-actions { width: 100%; justify-content: space-between; gap: 14px; }
+  .cs-contact-actions button { padding-inline: 16px; }
+}
+@media (max-width: 380px) {
+  .cs-inner { width: calc(100% - 32px); }
+  .cs-contact-actions { flex-direction: column-reverse; gap: 19px; }
+  .cs-contact-actions button { width: 100%; }
+  .cs-service-copy { padding-inline: 18px; }
+  .cs-service-visual { height: 230px; }
+}
+@media (prefers-reduced-motion: reduce) { .cs-service-copy, .cs-service-visual { animation: none; } .club-services button, .cs-tab-indicator > span::after { transition: none; } }

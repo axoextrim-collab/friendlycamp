@@ -1,147 +1,80 @@
-import React from 'react';
-import { Tent, ShieldCheck, Utensils, Truck, Compass, Flame, ArrowLeft, Sparkles, CheckCircle2, PhoneCall } from 'lucide-react';
+import { ManagedText, ManagedAnchor, siteText } from '../cms/PublicContent';
+import React, { useEffect, useRef, useState } from 'react';
+import { Tent, ShieldCheck, Utensils, Truck, Compass, MoonStar, Check, Phone, MessageCircle, Leaf, type LucideIcon } from 'lucide-react';
+import { SPECIALIZED_SERVICES, type SpecializedServiceId } from '../data/specializedServices';
+import { DESTINATION_IMAGE_CREDITS } from '../data/destinationImageCredits';
+import './services.css';
 
-interface ServicesSectionProps {
-  onOpenContact: () => void;
-}
+interface ServicesSectionProps { onOpenContact: () => void }
 
-const SPECIALIZED_SERVICES = [
-  {
-    id: 's1',
-    title: 'تجهیزات هیدرواستاتیک و ضدآب',
-    desc: 'تامین چادارهای ۲پوش آلمانی ضدباران، کیسه‌خواب‌های ۵- درجه، زیراندازهای آکاردئونی ضخیم و هدلامپ‌های پرنور صنعتی برای تمام شرکت‌کنندگان.',
-    icon: Tent,
-    badge: 'تجهیزات ۱۰۰٪ ضدآب',
-    highlightColor: 'from-amber-500 to-amber-600'
-  },
-  {
-    id: 's2',
-    title: 'لیدرهای بین‌المللی و امدادگر',
-    desc: 'همراهی لیدرهای کارت‌دار وزارت میراث فرهنگی، مربیان رسمی کوهنوردی و کمک‌پرستاران مجهز به جعبه کمک‌های اولیه و دستگاه شوک اولترا.',
-    icon: ShieldCheck,
-    badge: 'امنیت و ایمنی تضمینی',
-    highlightColor: 'from-emerald-600 to-teal-700'
-  },
-  {
-    id: 's3',
-    title: 'آشپزی تخصصی و باربیکیو جنگلی',
-    desc: 'سرو سه وعده غذای داغ، کباب‌های تازه در کمپ، صبحانه کامل محلی، چای ذغالی و قهوه اسپرسو در تمام طول پیمایش.',
-    icon: Utensils,
-    badge: 'پذیرایی داغ ۵ ستاره',
-    highlightColor: 'from-amber-600 to-[#d97706]'
-  },
-  {
-    id: 's4',
-    title: 'پشتیبانی ترابری و ترنسفر ۲ دیفرانسیل',
-    desc: 'حمل کامل کوله‌ها و چادرها با پاترول و نیسان‌های ۴x۴ تا محل کمپ، تا مسافران بدون بار سنگین از پیاده‌روی لذت ببرند.',
-    icon: Truck,
-    badge: 'حمل بار سبک و راحت',
-    highlightColor: 'from-teal-600 to-emerald-800'
-  },
-  {
-    id: 's5',
-    title: 'مسیریابی جی‌پي‌اس و بیس‌کمپ ایمن',
-    desc: 'برپایی بیس‌کمپ‌های اختصاصی فرندلی کمپ در نقاط غیرعمومی با پرژکتورهای خورشیدی، سرویس بهداشتی صحرایی و چادر خلوت.',
-    icon: Compass,
-    badge: 'کمپ اختصاصی و امن',
-    highlightColor: 'from-[#14382c] to-emerald-900'
-  },
-  {
-    id: 's6',
-    title: 'شب‌نشینی، موسیقی و آتش‌بازی',
-    desc: 'دورهمی‌های شبانه دور کنده‌های بزرگ آتش، بازی‌های گروهی، استماع آوای طبیعت و عکاسی حرفه‌ای از ستارگان شب.',
-    icon: Flame,
-    badge: 'شب‌های خاطره‌انگیز',
-    highlightColor: 'from-amber-500 to-orange-600'
-  }
-];
+const SERVICE_ICONS: Record<SpecializedServiceId, LucideIcon> = {
+  equipment: Tent, guides: ShieldCheck, cooking: Utensils, transport: Truck, route: Compass, experience: MoonStar,
+};
 
 export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenContact }) => {
-  return (
-    <section id="services" className="py-16 px-4 md:px-8 max-w-7xl mx-auto">
-      <div className="bg-[#14382c] text-white rounded-3xl p-8 sm:p-12 md:p-16 shadow-2xl relative overflow-hidden border border-emerald-400/20">
-        
-        {/* Background Glowing Ambient Orbs */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
+  const [selectedId, setSelectedId] = useState<SpecializedServiceId>('equipment');
+  const [compact, setCompact] = useState(false);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const active = SPECIALIZED_SERVICES.find(service => service.id === selectedId)!;
+  const ActiveIcon = SERVICE_ICONS[active.id];
 
-        {/* Section Header */}
-        <div className="relative z-10 text-center max-w-3xl mx-auto mb-14">
-          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-amber-500/20 text-[#f59e0b] text-xs font-bold mb-3 border border-amber-500/30">
-            <Sparkles size={16} />
-            <span>خدمات تخصصی باشگاه فرندلی کمپ</span>
-          </span>
-          
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-4">
-            خدمات فوق‌حرفه‌ای <span className="text-[#f59e0b]">کمپینگ و جنگل‌نوردی</span>
-          </h2>
-          
-          <p className="text-emerald-100/90 text-sm md:text-base leading-relaxed font-medium">
-            ما در فرندلی کمپ تمامی ملزومات کمپینگ صفر تا صد را آماده کرده‌ایم تا بدون دغدغه تجهیزات و امنیت، فقط از جادوی طبیعت لذت ببرید.
-          </p>
-        </div>
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 1050px)');
+    const update = () => setCompact(query.matches);
+    update(); query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
 
-        {/* 6 Specialized Services Grid */}
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {SPECIALIZED_SERVICES.map((srv) => {
-            const IconComp = srv.icon;
-            return (
-              <div
-                key={srv.id}
-                className="bg-slate-950/70 hover:bg-slate-950 rounded-2xl p-6 border border-white/10 hover:border-[#f59e0b]/60 transition-all duration-300 shadow-xl flex flex-col justify-between group hover:-translate-y-1.5"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-5">
-                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${srv.highlightColor} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition duration-300`}>
-                      <IconComp size={28} />
-                    </div>
-                    <span className="text-[11px] font-black px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                      {srv.badge}
-                    </span>
-                  </div>
+  const navigateTabs = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let next = index;
+    if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = SPECIALIZED_SERVICES.length - 1;
+    else if (event.key === (compact ? 'ArrowLeft' : 'ArrowDown')) next = (index + 1) % SPECIALIZED_SERVICES.length;
+    else if (event.key === (compact ? 'ArrowRight' : 'ArrowUp')) next = (index - 1 + SPECIALIZED_SERVICES.length) % SPECIALIZED_SERVICES.length;
+    else return;
+    event.preventDefault();
+    setSelectedId(SPECIALIZED_SERVICES[next].id);
+    tabRefs.current[next]?.focus({ preventScroll: true });
+    tabRefs.current[next]?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+  };
 
-                  <h3 className="text-xl font-extrabold text-white mb-3 group-hover:text-[#f59e0b] transition">
-                    {srv.title}
-                  </h3>
+  return <section id="services" className="club-services" aria-labelledby="club-services-title" dir="rtl">
+    <div className="cs-inner">
+      <header className="cs-heading">
+        <div><p className="cs-eyebrow"><ManagedText value={"خدمات تخصصی باشگاه فرندلی کمپ"}/></p><h2 id="club-services-title"><ManagedText value={"تو غرقِ سفر شو."}/><br /><span><ManagedText value={"جزئیات، با ما."}/></span></h2></div>
+        <p className="cs-intro"><ManagedText value={"از آماده‌سازی تجهیزات تا آخرین شب کمپ؛"}/><br className="cs-desktop-break" /><ManagedText value={" خدماتی که تجربهٔ سفر را کنار هم می‌سازند."}/></p>
+      </header>
 
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium mb-6">
-                    {srv.desc}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 text-xs font-bold text-amber-300 pt-4 border-t border-white/10">
-                  <CheckCircle2 size={16} className="text-emerald-400" />
-                  <span>تضمین کیفیت فرندلی کمپ</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Bottom Contact Callout */}
-        <div className="relative z-10 bg-gradient-to-r from-emerald-950/80 via-slate-900/90 to-emerald-950/80 p-6 sm:p-8 rounded-2xl border border-white/15 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4 text-right">
-            <div className="w-12 h-12 rounded-xl bg-[#f59e0b] text-slate-950 flex items-center justify-center shrink-0 font-black shadow-lg">
-              <PhoneCall size={24} />
-            </div>
-            <div>
-              <h4 className="text-lg font-black text-white">نیاز به تجهیزات سفارشی یا تور اختصاصی دارید؟</h4>
-              <p className="text-xs text-slate-300 font-medium mt-0.5">کارشناسان ما آماده پاسخگویی و مشاوره رایگان تجهیزات کمپینگ هستند.</p>
-            </div>
+      <div className="cs-board">
+        <div className="cs-selector">
+          <p className="cs-selector-label"><span><ManagedText value={"همراه تو، در هر بخش سفر"}/></span><span className="cs-mobile-hint"><ManagedText value={"۶ خدمت · ورق بزن"}/></span></p>
+          <div className="cs-tabs" role="tablist" aria-label={siteText("خدمات تخصصی سفر")} aria-orientation={compact ? 'horizontal' : 'vertical'}>
+            {SPECIALIZED_SERVICES.map((service, index) => {
+              const Icon = SERVICE_ICONS[service.id];
+              const isActive = service.id === selectedId;
+              return <button type="button" key={service.id} ref={element => { tabRefs.current[index] = element; }} id={`cs-tab-${service.id}`} className="cs-tab" role="tab" aria-selected={isActive} aria-controls="cs-service-panel" tabIndex={isActive ? 0 : -1} onClick={() => setSelectedId(service.id)} onKeyDown={event => navigateTabs(event, index)}>
+                <span className="cs-tab-icon"><Icon size={23} strokeWidth={1.35} /></span><span className="cs-tab-copy"><strong><ManagedText value={service.label}/></strong><small><ManagedText value={service.summary}/></small></span><span className="cs-tab-indicator" aria-hidden="true"><span /></span>
+              </button>;
+            })}
           </div>
-
-          <div className="flex items-center gap-3 shrink-0 w-full md:w-auto">
-            <button
-              onClick={onOpenContact}
-              className="w-full md:w-auto bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-black px-6 py-3.5 rounded-xl text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <span>مشاوره و رزرو تور</span>
-              <ArrowLeft size={16} />
-            </button>
-          </div>
+          <p className="cs-selector-footnote"><Leaf size={15} strokeWidth={1.5} /><ManagedText value={"مهمان طبیعتیم؛ با احترام سفر می‌کنیم."}/></p>
         </div>
 
+        <div id="cs-service-panel" className="cs-panel" role="tabpanel" aria-labelledby={`cs-tab-${active.id}`} tabIndex={0}>
+          <div className="cs-service-copy" key={`copy-${active.id}`}>
+            <p className="cs-service-tag"><ActiveIcon size={17} strokeWidth={1.5} /><ManagedText value={active.tag}/></p>
+            <h3><ManagedText value={active.title}/></h3><p className="cs-description"><ManagedText value={active.description}/></p>
+            <ul className="cs-service-details">{active.details.map(detail => <li key={detail.title}><Check size={16} strokeWidth={1.8} /><div><strong><ManagedText value={detail.title}/></strong><p><ManagedText value={detail.text}/></p></div></li>)}</ul>
+            <p className="cs-service-note"><ManagedText value={active.note}/></p>
+          </div>
+          <figure className={`cs-service-visual cs-visual-${active.id}`} key={`image-${active.id}`}>
+            <img src={active.image} alt={siteText(active.imageAlt)} style={{ objectPosition: active.imagePosition }} data-motion="off" loading="lazy" decoding="async" />
+            <figcaption><span className="cs-photo-caption"><ManagedText value={"برای تجربهٔ بهترِ طبیعت."}/></span><details className="cs-photo-credit"><summary><ManagedText value={"اعتبار عکس"}/></summary><div><span><ManagedText value={"تصویر منتخب برای معرفی خدمت"}/></span><ManagedAnchor href={active.id === 'route' ? DESTINATION_IMAGE_CREDITS.filband.source : active.source} target="_blank" rel="noreferrer"><ManagedText value={"منبع تصویر"}/></ManagedAnchor>{active.id === 'route' && <><bdi><ManagedText value={DESTINATION_IMAGE_CREDITS.filband.author}/></bdi><ManagedAnchor href={DESTINATION_IMAGE_CREDITS.filband.licenseUrl} target="_blank" rel="noreferrer"><bdi><ManagedText value={DESTINATION_IMAGE_CREDITS.filband.license}/></bdi></ManagedAnchor></>}</div></details></figcaption>
+          </figure>
+        </div>
       </div>
-    </section>
-  );
+
+      <footer className="cs-contact-strip"><div><span className="cs-contact-icon"><MessageCircle size={24} strokeWidth={1.25} /></span><div><h3><ManagedText value={"سفرت را متناسب با گروهت بچین."}/></h3><p><ManagedText value={"برای انتخاب خدمات و هماهنگی برنامهٔ اختصاصی، با ما گفت‌وگو کن."}/></p></div></div><div className="cs-contact-actions"><ManagedAnchor href="tel:09215014474" aria-label={siteText("تماس با فرندلی کمپ، ۰۹۲۱۵۰۱۴۴۷۴")}><Phone size={16} strokeWidth={1.5} /><bdi><ManagedText value={"۰۹۲۱ ۵۰۱ ۴۴۷۴"}/></bdi></ManagedAnchor><button type="button" onClick={onOpenContact}><ManagedText value={"گفت‌وگو با مشاور"}/></button></div></footer>
+    </div>
+  </section>;
 };

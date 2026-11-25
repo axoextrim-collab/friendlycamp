@@ -1,0 +1,7 @@
+// Database-backed callbacks are sequenced so they retain transaction ordering.
+export async function asyncMap<T,R>(items:T[],callback:(value:T,index:number,array:T[])=>R|Promise<R>):Promise<R[]>{const result:R[]=[];for(let index=0;index<items.length;index++)result.push(await callback(items[index],index,items));return result;}
+export async function asyncFilter<T>(items:T[],callback:(value:T,index:number,array:T[])=>unknown):Promise<T[]>{const result:T[]=[];for(let index=0;index<items.length;index++)if(await callback(items[index],index,items))result.push(items[index]);return result;}
+export async function asyncFind<T>(items:T[],callback:(value:T,index:number,array:T[])=>unknown):Promise<T|undefined>{for(let index=0;index<items.length;index++)if(await callback(items[index],index,items))return items[index];}
+export async function asyncSome<T>(items:T[],callback:(value:T,index:number,array:T[])=>unknown):Promise<boolean>{for(let index=0;index<items.length;index++)if(await callback(items[index],index,items))return true;return false;}
+export async function asyncFlatMap<T,R>(items:T[],callback:(value:T,index:number,array:T[])=>R[]|Promise<R[]>):Promise<R[]>{return (await asyncMap(items,callback)).flat();}
+export async function asyncForEach<T>(items:T[],callback:(value:T,index:number,array:T[])=>unknown):Promise<void>{for(let index=0;index<items.length;index++)await callback(items[index],index,items);}

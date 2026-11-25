@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import { controlDraft } from '../../src/admin/controlFields';
+import { EMPTY_TRAVEL } from '../../src/types/travel';
+// This helper runs only in isolated tests; production has no readiness bypass or demo documents.
+export async function prepareSalesFixture(base:string,cookie:string,tourId:string){
+ const call=async(path:string,method='GET',body?:unknown)=>{const response=await fetch(base+path,{method,headers:{'Content-Type':'application/json',Cookie:cookie},...(body===undefined?{}:{body:JSON.stringify(body)})});const data=await response.json();assert.ok(response.ok,JSON.stringify(data));return data;};
+ const policies=(await call('/api/manage/records/policies')).records;
+ for(const record of policies){const values={...controlDraft('policies',record),effectiveAt:new Date(Date.now()-86400000).toISOString(),approvedForSale:true,status:'published',organizationName:record.kind==='legal'?'برگزارکننده محیط آزمون':'',registrationNumber:record.kind==='legal'?'TEST-REGISTRATION':''};await call(`/api/manage/records/policies/${record.id}`,'PATCH',{values,expectedRevision:record.revision});}
+ const contact=(await call('/api/manage/records/contact')).records[0];await call(`/api/manage/records/contact/${contact.id}`,'PATCH',{values:{...controlDraft('contact',contact),address:'نشانی کامل صرفاً برای محیط آزمایش، خیابان نمونه، پلاک ۱۰',email:'operator@sales.test'},expectedRevision:contact.revision});
+ await call('/api/manage/records/licenses','POST',{expectedRevision:null,values:{title:'مدرک محیط آزمون',issuer:'مرجع آزمایشی',number:'TEST-LICENSE',holder:'برگزارکننده محیط آزمون',scope:'صرفاً داده آزمون نرم‌افزار؛ مدرک واقعی نیست',source:'https://fixture.example.test/license',expiresAt:new Date(Date.now()+365*86400000).toISOString(),status:'published'}});
+ const record=(await call('/api/manage/records/tours')).records.find((tour:any)=>tour.id===tourId);
+ const travel={...EMPTY_TRAVEL,difficulty:'moderate',fitnessRequirements:'آمادگی ثبت‌شده صرفاً برای محیط آزمون',equipment:['وسایل آزمایشی'],ageConditions:'شرایط سنی درج‌شده برای آزمون نرم‌افزار',medicalRestrictions:'شرایط هماهنگی درج‌شده برای آزمون',leaderName:'لیدر محیط آزمون',leaderQualifications:'صلاحیت صرفاً داده آزمایش است',leaderIssuer:'مرجع آزمون',leaderCredential:'TEST-GUIDE',leaderSource:'https://fixture.example.test/guide',faqs:[{question:'پرسش محیط آزمون؟',answer:'پاسخ محیط آزمون.'}],insurance:{provider:'بیمه‌گر محیط آزمون',policyNumber:'TEST-POLICY',coverage:'پوشش و سقف تعهدات صرفاً آزمایشی',exclusions:'استثناهای صرفاً آزمایشی',validFrom:new Date(Date.now()-86400000).toISOString(),validUntil:new Date(Date.now()+365*86400000).toISOString(),source:'https://fixture.example.test/insurance'}};
+ const values={...controlDraft('tours',record),summary:'شرح کامل برنامه فقط برای آزمون نرم‌افزار',heroImage:'/images/moments/camp.webp',included:'خدمت آزمایشی شامل',excluded:'خدمت آزمایشی غیرشامل',itinerary:[{title:'روز آزمون',description:'برنامه روزبه‌روز صرفاً آزمایشی'}],travel,status:'published'};
+ const result=await call(`/api/manage/records/tours/${record.id}`,'PATCH',{values,expectedRevision:record.revision});return result.record;
+}

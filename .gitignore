@@ -5,6 +5,8 @@ coverage/
 data/users.json
 data/*.tmp
 data/profiles.json
+data/newsletter.json
+data/bookings.sqlite*
 public/uploads/
 .DS_Store
 *.log
@@ -13,3 +15,5 @@ public/uploads/
 
 .env
 .env.local
+.docker/
+.deployment/

@@ -1,204 +1,68 @@
-import React, { useState } from 'react';
-import { Sparkles, Star, Calendar, ArrowLeft, Heart, Compass, ShieldCheck, Flame, Filter } from 'lucide-react';
-import { Tour } from '../types';
-import { POPULAR_TOURS } from '../data/mockData';
+import { ManagedText, ManagedAnchor, siteText } from '../cms/PublicContent';
+import { FilterResults, FilterSummary } from './FilterFeedback';
+import React, { useEffect, useRef, useState } from 'react';
+import { Binoculars, Check, ChevronDown, Clock3, Compass, Info, MapPin, Mountain, RotateCcw, SlidersHorizontal, Sparkles, Tent, TreePine, Waves, type LucideIcon } from 'lucide-react';
+import type { Tour } from '../types';
+import { useTourCatalog } from '../hooks/useTourCatalog';
+import { RECOMMENDATION_PHOTOS } from '../data/recommendationPhotos';
+import { initialRecommendationPreferences, recommendTours, TRAVEL_INTERESTS, type RecommendationPreferences, type RecommendationSort, type TourRecommendation, type TravelInterest } from '../utils/tourRecommendations';
+import './recommendations.css';
 
-interface RecommendedToursProps {
-  onSelectTour: (tour: Tour) => void;
-  userPreferences?: string[];
+const INTEREST_ICONS: Record<TravelInterest, LucideIcon> = { forest: TreePine, mountain: Mountain, water: Waves, wildlife: Binoculars, camping: Tent };
+
+function RecommendationCard({ match, personalized, onSelectTour }: { key?: React.Key; match: TourRecommendation; personalized: boolean; onSelectTour: (tour: Tour) => void }) {
+  const photo = RECOMMENDATION_PHOTOS[match.tour.id];
+  return <article className="rt-tour-card">
+    <div className="rt-tour-photo"><img src={photo?.image || match.tour.image} alt={siteText(photo?.alt || match.tour.title)} data-motion="off" loading="lazy" decoding="async" /><span className="rt-country"><ManagedText value={match.tour.country}/></span></div>
+    <div className="rt-tour-body">
+      <p className="rt-match-label"><span className="rt-match-symbol"><Check size={13} strokeWidth={1.7} /></span><ManagedText value={match.matchedInterests.length ? `${match.matchedInterests.length.toLocaleString('fa-IR')} علاقهٔ مشترک` : personalized ? 'همخوان با شرایط انتخابی' : 'از فهرست سفرها'}/></p>
+      <h3><ManagedText value={match.tour.title}/></h3><p className="rt-tour-location"><MapPin size={14} strokeWidth={1.5} /><ManagedText value={match.tour.location}/></p>
+      <div className="rt-tour-meta"><span><Clock3 size={15} strokeWidth={1.5} /><ManagedText value={match.tour.duration}/></span><span><ManagedText value={match.tour.country === 'ایران' ? 'سفر داخلی' : 'سفر خارجی'}/></span></div>
+      <details className="rt-reasons"><summary><Info size={15} strokeWidth={1.5} /><ManagedText value={"چرا این سفر؟"}/><ChevronDown size={14} /></summary>{match.reasons.length ? <ul>{match.reasons.map(reason => <li key={reason}><Check size={13} /><ManagedText value={reason}/></li>)}</ul> : <p><ManagedText value={"برای شروع، چند برنامه از فهرست سفرها را می‌بینی. با انتخاب علاقه‌ها و شرایطت، این پیشنهادها تغییر می‌کنند."}/></p>}</details>
+      <div className="rt-tour-booking"><div><span><ManagedText value={"هزینهٔ درج‌شده برای هر نفر"}/></span><strong><ManagedText value={match.tour.price}/></strong></div><button type="button" onClick={() => onSelectTour(match.tour)} aria-label={siteText(`جزئیات و رزرو ${match.tour.title}`)}><ManagedText value={"جزئیات و رزرو"}/></button></div>
+    </div>
+  </article>;
 }
 
-export const RecommendedTours: React.FC<RecommendedToursProps> = ({
-  onSelectTour,
-  userPreferences = []
-}) => {
-  // Category preferences for quick filtering algorithm
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+interface RecommendedToursProps { onSelectTour: (tour: Tour) => void; userPreferences?: string[] }
 
-  // Categories list
-  const categories = [
-    { id: 'all', name: 'همه پیشنهادات هوشمند', icon: Sparkles },
-    { id: 'desert', name: 'کویر و رمل‌نوردی', tag: 'کویر' },
-    { id: 'jungle', name: 'جنگل و هیرکانی', tag: 'گیلان' },
-    { id: 'sea', name: 'ساحل و جنوب', tag: 'جنوب' },
-    { id: 'camping', name: 'کمپینگ و شب‌مانی', tag: 'کمپ' },
-  ];
+export const RecommendedTours: React.FC<RecommendedToursProps> = ({ onSelectTour, userPreferences }) => {
+  const { tours, loading, error, refresh } = useTourCatalog();
+  const [preferences, setPreferences] = useState(() => initialRecommendationPreferences(userPreferences));
+  const [sort, setSort] = useState<RecommendationSort>('match');
+  const [showAll, setShowAll] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { resultsRef.current?.scrollTo({ left: 0, behavior: 'instant' }); }, [preferences, sort, showAll]);
+  const matches = recommendTours(tours, preferences, sort);
+  const visible = showAll ? matches : matches.slice(0, 3);
+  const personalized = preferences.interests.length > 0 || preferences.region !== 'all' || preferences.maxDays !== null || preferences.maxBudget !== null;
+  const update = (patch: Partial<RecommendationPreferences>) => { setPreferences(previous => ({ ...previous, ...patch })); setShowAll(false); };
+  const labels = [...preferences.interests.map(id => TRAVEL_INTERESTS.find(item => item.id === id)!.label), ...(preferences.region === 'all' ? [] : [preferences.region === 'domestic' ? 'داخل ایران' : 'خارج از ایران']), ...(preferences.maxDays === null ? [] : ['تا ' + preferences.maxDays.toLocaleString('fa-IR') + ' روز']), ...(preferences.maxBudget === null ? [] : ['بودجه تا ' + preferences.maxBudget.toLocaleString('fa-IR') + ' تومان']), ...(sort === 'match' ? [] : [sort === 'price' ? 'هزینه کمتر' : 'سفر کوتاه‌تر'])];
+  const reset = () => { setPreferences(initialRecommendationPreferences()); setSort('match'); setShowAll(false); };
+  const relaxations = [
+    { label: 'حذف سقف بودجه', active: preferences.maxBudget !== null, patch: { maxBudget: null } },
+    { label: 'مدت سفر آزاد', active: preferences.maxDays !== null, patch: { maxDays: null } },
+    { label: 'همهٔ مقصدها', active: preferences.region !== 'all', patch: { region: 'all' as const } },
+    { label: 'همهٔ علاقه‌ها', active: preferences.interests.length > 0, patch: { interests: [] } },
+  ].filter(option => option.active && recommendTours(tours, { ...preferences, ...option.patch }).length > 0);
 
-  // Simple Priority Score Algorithm
-  const scoredTours = POPULAR_TOURS.map((tour) => {
-    let score = 85; // Base match score
-    let matchReason = 'محبوب‌ترین تور فصل';
+  return <section id="recommended-tours" className="trip-recommendations" aria-labelledby="trip-recommendations-title" dir="rtl">
+    <div className="rt-inner">
+      <header className="rt-heading"><div><p className="rt-eyebrow"><Compass size={17} strokeWidth={1.4} /><ManagedText value={"سیستم پیشنهاد هوشمند فرندلی کمپ"}/></p><h2 id="trip-recommendations-title"><ManagedText value={"ماجراجویی بعدی، "}/><span><ManagedText value={"به سلیقهٔ تو."}/></span></h2><p className="rt-intro"><ManagedText value={"حال‌وهوای سفرت را انتخاب کن؛ پیشنهادهای نزدیک‌تر به تو همین‌جا پیدا می‌شوند."}/></p></div><details className="rt-method"><summary><Info size={16} /><ManagedText value={"پیشنهادها چطور انتخاب می‌شوند؟"}/></summary><div><strong><ManagedText value={"انتخاب‌های تو، دلیل پیشنهادهاست."}/></strong><p><ManagedText value={"علاقه‌ها ترتیب پیشنهادها را مشخص می‌کنند. مدت سفر، بودجه و محدودهٔ مقصد، شرط نمایش هر سفر هستند."}/></p><p><ManagedText value={"دلیل انتخاب هر برنامه را در «چرا این سفر؟» می‌بینی. پیشنهادها از فهرست فعلی تورها انتخاب می‌شوند."}/></p></div></details></header>
 
-    // Boost score based on user view / preference match
-    if (tour.title.includes('کویر') || tour.location.includes('یزد')) {
-      if (selectedCategory === 'desert' || userPreferences.includes('desert')) {
-        score += 13;
-        matchReason = 'تطابق ۱۰۰٪ با علاقه شما به کویرنوردی';
-      }
-    } else if (tour.title.includes('جنگل') || tour.country.includes('گیلان') || tour.country.includes('مازندران')) {
-      if (selectedCategory === 'jungle' || userPreferences.includes('jungle')) {
-        score += 12;
-        matchReason = 'پیشنهاد ویژه بر اساس علاقه به طبیعت سرسبز';
-      }
-    } else if (tour.highlights.some(h => h.includes('کمپ') || h.includes('چادر'))) {
-      if (selectedCategory === 'camping') {
-        score += 10;
-        matchReason = 'پیشنهاد بر اساس رزروهای قبلی تورهای کمپینگ';
-      }
-    }
-
-    if (tour.rating >= 4.9) {
-      score += 3;
-    }
-
-    const matchPercent = Math.min(99, score);
-
-    return {
-      ...tour,
-      matchPercent,
-      matchReason
-    };
-  }).sort((a, b) => b.matchPercent - a.matchPercent);
-
-  // Filtered list
-  const displayTours = scoredTours.filter((tour) => {
-    if (selectedCategory === 'all') return true;
-    if (selectedCategory === 'desert') return tour.title.includes('کویر') || tour.location.includes('یزد');
-    if (selectedCategory === 'jungle') return tour.title.includes('جنگل') || tour.country.includes('گیلان') || tour.country.includes('مازندران');
-    if (selectedCategory === 'sea') return tour.title.includes('دریا') || tour.title.includes('ساحل') || tour.country.includes('جنوب');
-    if (selectedCategory === 'camping') return tour.highlights.some(h => h.includes('کمپ') || h.includes('چادر'));
-    return true;
-  }).slice(0, 3);
-
-  return (
-    <section className="py-12 bg-gradient-to-b from-[#e1f3f3] via-[#ebf7f7] to-[#ebf7f7] relative overflow-hidden" id="recommended-tours">
-      
-      {/* Background Decorative Glow */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#84cc16]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-10 w-80 h-80 bg-[#004e5a]/5 rounded-full blur-2xl pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-[#004e5a]/10 text-[#004e5a] px-3.5 py-1 rounded-full text-xs font-black mb-2 border border-[#004e5a]/20">
-              <Sparkles size={14} className="text-[#84cc16] animate-pulse" />
-              <span>سیستم پیشنهاد هوشمند فرندلی کمپ</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#003843] tracking-tight">
-              پیشنهادهای اختصاصی برای شما
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
-              بر اساس الگوریتم اولویت‌بندی مقصدهای قبلی، علایق انتخابی و بازخورد مسافران مشابه
-            </p>
-          </div>
-
-          {/* Quick Filter Tags */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer border ${
-                  selectedCategory === cat.id
-                    ? 'bg-[#004e5a] text-white border-[#004e5a] shadow-md'
-                    : 'bg-white/80 text-slate-700 border-slate-200 hover:bg-white'
-                }`}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Recommended Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {displayTours.map((tour) => (
-            <div
-              key={tour.id}
-              className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col group relative"
-            >
-              {/* Image & Match Badge */}
-              <div className="relative h-56 overflow-hidden">
-                <img
-                  src={tour.image}
-                  alt={tour.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-
-                {/* Match Score Badge */}
-                <div className="absolute top-3 right-3 bg-[#064e3b]/95 backdrop-blur-md text-white text-[11px] font-black px-3 py-1 rounded-full border border-emerald-400/40 shadow-md flex items-center gap-1">
-                  <Flame size={13} className="text-[#84cc16] fill-[#84cc16]" />
-                  <span>{tour.matchPercent}٪ تطابق با علایق شما</span>
-                </div>
-
-                {/* Duration Badge */}
-                <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-md text-slate-900 text-[11px] font-extrabold px-2.5 py-1 rounded-xl shadow">
-                  {tour.duration}
-                </div>
-
-                {/* Rating Badge */}
-                <div className="absolute bottom-3 left-3 bg-amber-400 text-amber-950 text-[11px] font-black px-2 py-1 rounded-xl flex items-center gap-1 shadow">
-                  <Star size={12} className="fill-amber-950" />
-                  <span>{tour.rating}</span>
-                </div>
-              </div>
-
-              {/* Card Content */}
-              <div className="p-5 flex-1 flex flex-col justify-between text-right">
-                <div>
-                  {/* Match Reason Banner */}
-                  <div className="bg-emerald-50 text-emerald-900 text-[11px] font-bold px-3 py-1 rounded-xl mb-2.5 border border-emerald-200/80 flex items-center gap-1.5">
-                    <ShieldCheck size={14} className="text-[#004e5a] shrink-0" />
-                    <span className="truncate">{tour.matchReason}</span>
-                  </div>
-
-                  <h3 className="text-base font-black text-[#003843] mb-1.5 line-clamp-1 group-hover:text-[#004e5a] transition">
-                    {tour.title}
-                  </h3>
-
-                  <p className="text-xs text-slate-500 font-medium mb-3 flex items-center gap-1">
-                    <Compass size={14} className="text-[#84cc16]" />
-                    <span>موقعیت: {tour.location} - {tour.country}</span>
-                  </p>
-
-                  {/* Tour Highlights Pills */}
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {tour.highlights.slice(0, 3).map((h, i) => (
-                      <span
-                        key={i}
-                        className="bg-slate-100 text-slate-700 text-[10px] font-extrabold px-2 py-0.5 rounded-md"
-                      >
-                        ✓ {h}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Price & Action Button */}
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <div className="text-right">
-                    <span className="text-[10px] text-slate-400 block font-medium">پایه قیمت هر نفر:</span>
-                    <span className="text-sm font-black text-[#004e5a] font-mono">{tour.price}</span>
-                  </div>
-
-                  <button
-                    onClick={() => onSelectTour(tour)}
-                    className="bg-[#004e5a] hover:bg-[#003843] text-white font-black text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer group-hover:bg-[#84cc16] group-hover:text-[#064e3b]"
-                  >
-                    <span>رزرو سریع تور</span>
-                    <ArrowLeft size={14} />
-                  </button>
-                </div>
-
-              </div>
-            </div>
-          ))}
-        </div>
-
+      <div className="rt-preferences" aria-label={siteText("انتخاب شرایط سفر")}>
+        <fieldset className="rt-interest-field"><legend><Sparkles size={17} strokeWidth={1.4} /><ManagedText value={"سفر برای تو چه حال‌وهوایی دارد؟"}/><span><ManagedText value={"می‌توانی چند علاقه را انتخاب کنی."}/></span></legend><div className="rt-interest-options">{TRAVEL_INTERESTS.map(interest => { const Icon = INTEREST_ICONS[interest.id]; const selected = preferences.interests.includes(interest.id); return <button key={interest.id} type="button" aria-pressed={selected} onClick={() => update({ interests: selected ? preferences.interests.filter(value => value !== interest.id) : [...preferences.interests, interest.id] })}><Icon size={22} strokeWidth={1.3} /><span><ManagedText value={interest.label}/></span><span className="rt-interest-check" aria-hidden="true">{selected && <Check size={12} strokeWidth={2} />}</span></button>; })}</div></fieldset>
+        <div className="rt-constraints"><label htmlFor="rt-region"><ManagedText value={"محدودهٔ سفر"}/><select id="rt-region" data-active={preferences.region !== 'all'} value={preferences.region} onChange={event => update({ region: event.target.value as RecommendationPreferences['region'] })}><option value="all">{siteText("داخلی و خارجی")}</option><option value="domestic">{siteText("فقط داخل ایران")}</option><option value="international">{siteText("فقط خارج از ایران")}</option></select></label><label htmlFor="rt-days"><ManagedText value={"چقدر زمان داری؟"}/><select id="rt-days" data-active={preferences.maxDays !== null} value={preferences.maxDays ?? ''} onChange={event => update({ maxDays: event.target.value ? Number(event.target.value) : null })}><option value="">{siteText("مدت سفر آزاد")}</option><option value="3">{siteText("تا ۳ روز")}</option><option value="5">{siteText("تا ۵ روز")}</option><option value="7">{siteText("تا ۷ روز")}</option></select></label><label htmlFor="rt-budget"><ManagedText value={"سقف بودجه برای هر نفر"}/><select id="rt-budget" data-active={preferences.maxBudget !== null} value={preferences.maxBudget ?? ''} onChange={event => update({ maxBudget: event.target.value ? Number(event.target.value) : null })}><option value="">{siteText("بدون سقف مشخص")}</option><option value="10000000">{siteText("تا ۱۰ میلیون تومان")}</option><option value="25000000">{siteText("تا ۲۵ میلیون تومان")}</option><option value="35000000">{siteText("تا ۳۵ میلیون تومان")}</option></select></label><div className="rt-preference-actions"><button type="button" className="rt-reset" onClick={reset} disabled={!personalized && sort === 'match'}><RotateCcw size={15} strokeWidth={1.5} /><ManagedText value={"پاک‌کردن انتخاب‌ها"}/></button>{!loading && !error && <ManagedAnchor className="rt-mobile-results-link" href="#rt-results-summary"><ManagedText value={"دیدن "}/><ManagedText value={matches.length.toLocaleString('fa-IR')}/><ManagedText value={" نتیجه"}/></ManagedAnchor>}</div></div>
       </div>
-    </section>
-  );
+
+      <FilterSummary labels={labels} onReset={reset} onRefresh={() => void refresh()} loading={loading}/>
+      <div id="rt-results-summary" tabIndex={-1} className="rt-results-heading"><div><span className="rt-results-icon"><SlidersHorizontal size={19} strokeWidth={1.4} /></span><div><h3><ManagedText value={personalized ? 'پیشنهادهای هماهنگ با انتخاب تو' : 'برای شروع، این سفرها را ببین'}/></h3><p role="status" aria-live="polite"><ManagedText value={loading ? 'در حال دریافت برنامه‌ها…' : error ? 'دریافت برنامه‌ها انجام نشد.' : personalized ? `${matches.length.toLocaleString('fa-IR')} سفر همخوان از ${tours.length.toLocaleString('fa-IR')} برنامهٔ فهرست` : 'با تغییر انتخاب‌ها، پیشنهادها به‌روز می‌شوند.'}/></p></div></div><label className="rt-sort" htmlFor="rt-sort"><ManagedText value={"مرتب‌سازی"}/><select id="rt-sort" data-active={sort !== 'match'} value={sort} onChange={event => setSort(event.target.value as RecommendationSort)}><option value="match">{siteText("بیشترین همخوانی")}</option><option value="price">{siteText("هزینهٔ کمتر")}</option><option value="duration">{siteText("سفر کوتاه‌تر")}</option></select></label></div>
+
+      <FilterResults loading={loading} error={error} count={matches.length} filtered={labels.length > 0} onRetry={() => void refresh()} onReset={reset} emptyTitle={personalized ? 'سفری با این انتخاب‌ها پیدا نشد.' : 'هنوز برنامه‌ای برای پیشنهاد منتشر نشده است.'} emptyActions={relaxations.map(option => <button type="button" key={option.label} onClick={() => update(option.patch)}><ManagedText value={option.label}/></button>)}>
+      {matches.length ? <><p className="rt-mobile-hint"><ManagedText value={visible.length > 1 ? 'برای دیدن پیشنهادهای بعدی، ورق بزن.' : ''}/></p><div id="rt-results" ref={resultsRef} className={`rt-results${visible.length === 1 ? ' has-one' : visible.length === 2 ? ' has-two' : ''}`}>{visible.map(match => <RecommendationCard key={match.tour.id} match={match} personalized={personalized} onSelectTour={onSelectTour} />)}</div>{matches.length > 3 && <div className="rt-show-all"><button type="button" onClick={() => setShowAll(value => !value)} aria-expanded={showAll} aria-controls="rt-results"><ManagedText value={showAll ? 'نمایش سه پیشنهاد اول' : `دیدن هر ${matches.length.toLocaleString('fa-IR')} پیشنهاد`}/></button></div>}</> : null}
+
+      </FilterResults>
+      <footer className="rt-footer"><p><ManagedText value={"انتخاب‌ها فقط برای پیشنهادهای همین بخش استفاده می‌شوند."}/></p><p><ManagedText value={"نتیجه‌ها از فهرست برنامه‌های منتشرشده دریافت می‌شوند؛ شرایط نوبت انتخابی را پیش از رزرو بررسی کن."}/></p></footer>
+    </div>
+  </section>;
 };

@@ -1,0 +1,9 @@
+import { useSyncExternalStore } from 'react';
+import { bookingApi } from '../api/booking';
+import type { BookingCapabilities, BookingTour } from '../types/booking';
+let state: { tours: BookingTour[]; capabilities: BookingCapabilities; loading: boolean; error: string } = { tours: [], capabilities: { paymentMode: 'disabled', smsConfigured: false }, loading: true, error: '' };
+const listeners = new Set<() => void>(); let pending: Promise<void> | undefined; let timer: ReturnType<typeof setInterval> | undefined;
+export function refreshTourCatalog(options: { background?: boolean } = {}) { if (!options.background && (!state.loading || state.error)) { state = { ...state, loading: true, error: '' }; listeners.forEach(listener => listener()); } if (pending) return pending; pending = bookingApi.catalog().then(result => { state = { ...result, loading: false, error: '' }; }).catch(error => { state = { ...state, loading: false, error: error instanceof Error ? error.message : 'دریافت برنامه‌ها انجام نشد.' }; }).finally(() => { pending = undefined; listeners.forEach(listener => listener()); }); return pending; }
+const refreshInBackground = () => { if(document.visibilityState==='hidden')return; void refreshTourCatalog({ background: true }); };
+const subscribe = (listener: () => void) => { listeners.add(listener); if (listeners.size === 1) { refreshInBackground(); timer = setInterval(refreshInBackground, 20000); window.addEventListener('focus', refreshInBackground); } return () => { listeners.delete(listener); if (!listeners.size) { clearInterval(timer); timer = undefined; window.removeEventListener('focus', refreshInBackground); } }; };
+export function useTourCatalog() { const catalog = useSyncExternalStore(subscribe, () => state, () => state); return { ...catalog, refresh: refreshTourCatalog }; }

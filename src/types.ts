@@ -3,7 +3,14 @@ export interface Destination {
   title: string;
   country: string;
   image: string;
-  toursCount: number;
+  toursCount?: number;
+  province?: string;
+  city?: string;
+  category?: 'forest' | 'coast' | 'desert' | 'water' | 'mountain';
+  categoryLabel?: string;
+  highlights?: string[];
+  imagePosition?: string;
+  imageCredit?: { author: string; source: string; license: string; licenseUrl: string };
   description?: string;
   price?: string;
   rating?: number;
@@ -39,7 +46,9 @@ export interface Tour {
   flag?: string;
   badge?: string;
   features?: string[];
+  travel?:import('./types/travel').TravelDetails; routeAvailable?:boolean;
   itinerary?: TourItineraryDay[];
+  excluded?: string; gallery?: Array<{url:string;alt:string;credit?:string;source?:string}>;
   difficultyLevel?: number; // 1 to 5
   vipPrice?: string;
   leaderName?: string;

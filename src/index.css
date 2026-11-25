@@ -1,5 +1,40 @@
 @import "tailwindcss";
 
+.header-menu-link {
+  position: relative;
+  transition: color 220ms ease, transform 220ms ease;
+}
+
+.header-menu-link::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 2px;
+  height: 2px;
+  border-radius: 999px;
+  background: #f59e0b;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 260ms ease;
+  pointer-events: none;
+}
+
+.header-menu-link:is(:hover, :focus-visible) {
+  color: #f59e0b;
+  transform: translateY(-2px);
+}
+
+.header-menu-link:is(:hover, :focus-visible)::after {
+  transform: scaleX(1);
+}
+.header-menu-link[aria-current="page"] { color: #f59e0b; }
+.header-menu-link[aria-current="page"]::after { transform: scaleX(1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .header-menu-link, .header-menu-link::after { transition: none; }
+  .header-menu-link:is(:hover, :focus-visible) { transform: none; }
+}
+
 html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after {
   animation-duration: 0.01ms !important;
   animation-iteration-count: 1 !important;
@@ -173,18 +208,14 @@ html.media-motion-disabled .nature-motion-image {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.055'/%3E%3C/svg%3E");
 }
 
-.nature-app > main > section:not(#hero):not(#shop):not(#contact) {
+.nature-app > main > section:not(#hero):not(#shop):not(#contact):not(#community):not(#calendar):not(#services):not(#recommended-tours):not(#testimonials) {
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
   border-radius: 2.5rem;
 }
 
 .nature-app > main > section[id="destinations"],
-.nature-app > main > section[id="calendar"],
 .nature-app > main > section[id="experience"],
-.nature-app > main > section[id="services"],
-.nature-app > main > section[id="tours"],
-.nature-app > main > section[id="testimonials"],
 .nature-app > main > section[id="why-choose-us"],
 .nature-app > main > section[id="blog"] {
   border: 1px solid rgba(255,255,255,.78);
@@ -232,18 +263,33 @@ html.media-motion-disabled .nature-motion-image {
 }
 
 .nature-app #hero::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  z-index: 12;
-  height: 12rem;
-  pointer-events: none;
-  background: linear-gradient(to top, rgba(7,31,27,.82), transparent);
+  content: none;
 }
 
 .nature-app #hero img {
-  transform: scale(1.015);
-  filter: saturate(.88) contrast(1.06);
+  filter: none;
+}
+
+.iran-hero { background: #d8ece8; }
+.iran-hero-shade {
+  background: linear-gradient(to bottom, rgba(11,35,38,.24), transparent 23%, transparent 45%, rgba(10,35,36,.12) 58%, rgba(8,30,32,.7) 100%);
+}
+.iran-hero-caption h1 { text-shadow: 0 2px 22px rgba(0,20,24,.35); }
+.iran-hero-location { display: flex; justify-content: center; align-items: center; gap: 7px; margin-bottom: 12px; color: var(--hero-accent); font-size: .9375rem; font-weight: 500; }
+.iran-hero-arrow { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.7); border-radius: 50%; background: rgba(255,255,255,.9); color: #214c49; box-shadow: 0 3px 16px rgba(8,45,48,.08); transition: background-color .2s ease, color .2s ease; }
+.iran-hero-arrow:hover { background: var(--hero-accent); color: #173c3b; }
+.iran-hero-pagination { display: grid; place-items: center; width: 40px; height: 28px; cursor: pointer; }
+.iran-hero-pagination span { display: block; width: 7px; height: 7px; border-radius: 8px; background: rgba(255,255,255,.65); transition: width .3s ease, background-color .3s ease; }
+.iran-hero-pagination .is-active { width: 30px; background: var(--hero-accent); }
+.iran-hero-credit { position: absolute; bottom: 15px; right: 20px; z-index: 25; max-width: 280px; color: white; font-size: max(var(--fc-text-floor, 0px), .75rem); }
+.iran-hero-credit summary { cursor: pointer; padding: 5px 8px; border-radius: 4px; background: rgba(8,30,32,.48); }
+.iran-hero-credit > div { position: absolute; bottom: calc(100% + 8px); right: 0; width: 260px; padding: 12px 15px; background: rgba(10,38,39,.97); border: 1px solid rgba(255,255,255,.2); border-radius: 8px; line-height: 1.9; }
+.iran-hero-credit a { text-decoration: underline; text-underline-offset: 3px; }
+.iran-hero-credit p { margin-top: 5px; color: #e1eae7; }
+@media (max-width: 640px) {
+  .iran-hero-caption { bottom: 150px; padding-inline: 50px; }
+  .iran-hero-location { font-size: .875rem; margin-bottom: 8px; }
+  .iran-hero-credit { right: 12px; bottom: 10px; max-width: calc(100% - 24px); font-size: max(var(--fc-text-floor, 0px), .75rem); }
 }
 
 .nature-app #shop {
@@ -256,7 +302,7 @@ html.media-motion-disabled .nature-motion-image {
 }
 
 @media (max-width: 767px) {
-  .nature-app > main > section:not(#hero):not(#shop):not(#contact) {
+  .nature-app > main > section:not(#hero):not(#shop):not(#contact):not(#community):not(#calendar):not(#services):not(#recommended-tours):not(#testimonials) {
     margin: .75rem;
     border-radius: 1.75rem;
   }

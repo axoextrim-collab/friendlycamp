@@ -1,0 +1,38 @@
+# Free configuration reference for the EXISTING service identified in
+# deployment/render-target.json. Verify its actual name/runtime/region before
+# applying. Do not create a replacement service or discard an existing disk.
+services:
+  - type: web
+    name: friendlycamp
+    runtime: docker
+    repo: https://github.com/axoextrim-collab/friendlycamp.git
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeployTrigger: "off"
+    healthCheckPath: /api/ready
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TZ
+        value: Asia/Tehran
+      - key: DATABASE_BACKEND
+        value: postgres
+      - key: DATABASE_URL
+        sync: false
+      - key: REQUIRE_EXTERNAL_DATABASE
+        value: "true"
+      - key: REQUIRE_PERSISTENT_DISK
+        value: "false"
+      - key: UPLOAD_STORAGE
+        value: supabase
+      - key: SUPABASE_STORAGE_BUCKET
+        value: friendlycamp-uploads
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: BOOKING_PAYMENT_MODE
+        value: disabled

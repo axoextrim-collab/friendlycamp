@@ -76,7 +76,7 @@ export const FriendlyCampLogo: React.FC<FriendlyCampLogoProps> = ({
           </span>
           <div className="flex items-center justify-between text-slate-300 gap-1">
             <span className={`font-bold tracking-widest text-[#f59e0b] ${currentSize.subText}`}>
-              فرندلی کمپ • 2018
+              فرندلی کمپ
             </span>
           </div>
         </div>
