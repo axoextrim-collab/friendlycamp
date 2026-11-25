@@ -1,3 +1,5 @@
+import type {SiteTheme} from '../src/types/siteTheme';
+import {siteThemeCss} from '../src/utils/siteTheme';
 import { absoluteStructuredData, safeJsonLd } from '../src/routing/structuredData';
 import { routeMetadata, publicRoutePaths, type PageMetadata } from '../src/routing/metadata';
 import { legacyRouteRedirect, productPath, resolveRoute } from '../src/routing/routes';
@@ -19,7 +21,7 @@ export function pageRedirect(pathname: string, search: string): string | null {
     }
     return null;
 }
-export function renderPageHtml(template: string, meta: PageMetadata, origin: string): string {
+export function renderPageHtml(template: string, meta: PageMetadata, origin: string,siteName='فرندلی کمپ',appearance?:SiteTheme): string {
     const clean = template.replace(/<title>[\s\S]*?<\/title>/gi, '').replace(/<meta\s+[^>]*(?:name=["'](?:description|robots)["']|property=["']og:(?:title|description|type|url|image)["'])[^>]*>/gi, '').replace(/<link\s+[^>]*rel=["']canonical["'][^>]*>/gi, '');
     const tags = [
         ...(meta.structuredData ? [`<script type="application/ld+json" data-site-schema="true">${safeJsonLd(absoluteStructuredData(meta.structuredData, origin))}</script>`] : []),
@@ -27,9 +29,10 @@ export function renderPageHtml(template: string, meta: PageMetadata, origin: str
         `<meta name="description" content="${escapeHtml(meta.description)}" />`,
         `<meta name="robots" content="${meta.noIndex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large'}" />`,
         `<link rel="canonical" href="${escapeHtml(new URL(meta.path, origin).href)}" />`,
-        ...Object.entries({ 'og:title': meta.title, 'og:description': meta.description, 'og:type': meta.type, 'og:url': new URL(meta.path, origin).href, 'og:image': new URL(meta.image, origin).href }).map(([property, content]) => `<meta property="${property}" content="${escapeHtml(content)}" />`),
+        ...Object.entries({ 'og:site_name':siteName,'og:title': meta.title, 'og:description': meta.description, 'og:type': meta.type, 'og:url': new URL(meta.path, origin).href, 'og:image': new URL(meta.image, origin).href }).map(([property, content]) => `<meta property="${property}" content="${escapeHtml(content)}" />`),
     ];
-    return clean.replace('</head>', `${tags.join('\n    ')}\n  </head>`);
+    const themed=appearance?clean.replace(/<html\b([^>]*)>/i,(_tag,attributes)=>'<html'+attributes+' data-fc-site-theme="true" data-fc-theme-mode="'+appearance.mode+'">').replace('</head>','<style id="fc-site-theme">'+siteThemeCss(appearance)+'</style></head>'):clean;
+    return themed.replace('</head>', `${tags.join('\n    ')}\n  </head>`);
 }
 export function sitemapXml(products: ShopProduct[], origin: string, tours: Tour[] = []) {
     const paths = [...publicRoutePaths(tours), ...products.map(product => productPath(product.id))];

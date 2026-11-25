@@ -1,15 +1,17 @@
 import { z } from 'zod';
 import type { BookingCapabilities } from '../src/types/booking';
+import { runtimeSetting } from './operationalSettings';
 export class BookingError extends Error {
     constructor(public code: string, message: string, public status = 400) { super(message); }
 }
 export function bookingCapabilities(): BookingCapabilities {
-    const requested = process.env.BOOKING_PAYMENT_MODE || (process.env.NODE_ENV === 'production' ? 'disabled' : 'sandbox');
-    return { paymentMode: requested === 'sandbox' ? 'sandbox' : requested === 'http' && process.env.PAYMENT_HTTP_URL && process.env.PAYMENT_API_TOKEN ? 'http' : 'disabled', smsConfigured: !!(process.env.SMS_HTTP_URL && process.env.SMS_API_TOKEN) };
+    const payment=runtimeSetting('payment'),sms=runtimeSetting('sms'),requested=payment.mode;
+    return { paymentMode: requested === 'sandbox' ? 'sandbox' : requested === 'http' && payment.baseUrl && payment.token ? 'http' : 'disabled', smsConfigured: !!(sms.enabled && sms.baseUrl && sms.token) };
 }
 async function providerRequest(kind: 'PAYMENT' | 'SMS', endpoint: string, body: unknown) {
-    const root = process.env[`${kind}_HTTP_URL`];
-    const token = process.env[`${kind}_API_TOKEN`];
+    const config=runtimeSetting(kind==='PAYMENT'?'payment':'sms');
+    const root = config.baseUrl;
+    const token = config.token;
     if (!root || !token)
         throw new BookingError('PROVIDER_NOT_CONFIGURED', 'سرویس هنوز پیکربندی نشده است.', 503);
     const url = new URL(root.replace(/\/$/, '') + endpoint);

@@ -116,6 +116,10 @@ async function toPublicUser(user: StoredUser): Promise<PublicUser> {
     return { ...safe, role: await assignedRole(user.id) || safe.role };
 }
 export async function listAccountUsers() { return await asyncMap((await readUsers()), toPublicUser); }
+// Explicit allow-list: the management directory must never expose credentials or identity documents.
+export async function adminAccountDirectory() {
+    return await asyncMap(await readUsers(), async user => ({ id: user.id, fullName: user.fullName, phone: user.phone, email: user.email, createdAt: user.createdAt, role: (await toPublicUser(user)).role }));
+}
 async function requirePassword(user: StoredUser | undefined, password: string) {
     if (!user)
         throw new Error('USER_NOT_FOUND');

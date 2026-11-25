@@ -4,6 +4,8 @@ import App from './App.tsx';
 import './index.css';
 import './mobile.css';
 import './accessibility.css';
+import './site-theme-components.css';
+import './site-theme.css';
 import {AppErrorBoundary} from './components/AppErrorBoundary';
 import { installDialogKeyboardNavigation } from './utils/dialogKeyboard';
 

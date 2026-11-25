@@ -1,0 +1,22 @@
+/* Semantic brand tokens are scoped to the public site, leaving the management console stable. */
+html[data-fc-site-theme] :is(.nature-app,.page-app,.fs-app:not(.cp-store),.bk-app){
+ --fc-ink:var(--site-text);--fc-mist:var(--site-background);--fc-forest:var(--site-primary-strong);--fc-deep:var(--site-primary-deep);--fc-lime:var(--site-accent);
+ --fs-ink:var(--site-text);--fs-muted:var(--site-muted);--fs-green:var(--site-primary-strong);--fs-border:var(--site-border);--fs-paper:var(--site-background);--fs-gold:var(--site-accent-ink);
+ --color-emerald-50:var(--site-primary-soft);--color-emerald-100:var(--site-primary-soft);--color-emerald-200:var(--site-border);--color-emerald-300:var(--site-primary);--color-emerald-400:var(--site-primary);--color-emerald-500:var(--site-primary);--color-emerald-600:var(--site-primary-strong);--color-emerald-700:var(--site-primary-strong);--color-emerald-800:var(--site-primary-strong);--color-emerald-900:var(--site-primary-deep);--color-emerald-950:var(--site-primary-deep);
+ --color-lime-50:var(--site-primary-soft);--color-lime-100:var(--site-primary-soft);--color-lime-200:var(--site-accent);--color-lime-300:var(--site-accent);--color-lime-400:var(--site-accent);--color-lime-500:var(--site-primary);--color-lime-600:var(--site-primary-ink);--color-lime-700:var(--site-primary-ink);--color-lime-800:var(--site-primary-strong);--color-lime-900:var(--site-primary-deep);
+ background-color:var(--site-background);color:var(--site-text);
+}
+html[data-fc-site-theme] :is(.nature-app,.page-app) :is([class~="bg-white"],[class~="bg-slate-50"],[class~="bg-slate-100"],[class~="bg-stone-50"],[class~="bg-gray-50"]){background-color:var(--site-surface)}
+html[data-fc-site-theme] :is(.nature-app,.page-app) :is([class~="text-slate-900"],[class~="text-slate-800"],[class~="text-gray-900"],[class~="text-gray-800"],[class~="text-emerald-950"],[class~="text-emerald-900"]){color:var(--site-text)}
+html[data-fc-site-theme] :is(.nature-app,.page-app) :is([class~="text-slate-700"],[class~="text-slate-600"],[class~="text-slate-500"],[class~="text-slate-400"],[class~="text-gray-600"],[class~="text-gray-500"]){color:var(--site-muted)}
+html[data-fc-site-theme] :is(.nature-app,.page-app) :is([class~="border-slate-100"],[class~="border-slate-200"],[class~="border-gray-200"]){border-color:var(--site-border)}
+html[data-fc-site-theme] :is(.nature-app,.page-app) :is([class~="bg-lime-300"],[class~="bg-lime-200"],[class~="bg-lime-400"]){color:var(--site-on-accent)}
+html[data-fc-site-theme] :is(.nature-app,.page-app) :is([class~="bg-emerald-900"],[class~="bg-emerald-800"],[class~="bg-emerald-700"]){color:var(--site-on-primary)}
+html[data-fc-site-theme] :is(.nature-app,.page-app){background:var(--site-background)!important;color:var(--site-text)}
+html[data-fc-site-theme] :is(.nature-app,.page-app) :is(input,textarea,select):not([type=checkbox]):not([type=radio]):not([type=color]):not(.fp-app *){color:var(--site-text)}
+html[data-fc-site-theme] :is(.nature-app,.page-app,.fs-app:not(.cp-store),.bk-app) :focus-visible{outline-color:var(--site-primary-ink)}
+html[data-fc-site-theme] .os-product-image img{mix-blend-mode:normal;background:#fff}
+html[data-fc-site-theme] .nature-app > main::before{opacity:.12}
+html[data-fc-site-theme] ::selection{background:var(--site-accent);color:var(--site-on-accent)}
+html[data-fc-site-theme] :is(.fs-button-primary,.bk-button,.os-card-actions .os-primary){background-color:var(--site-primary-strong);color:var(--site-on-primary)}
+html[data-fc-site-theme] :is(.nature-app,.page-app) :is([class~="text-emerald-50"],[class~="text-emerald-100"]){color:var(--site-on-dark-muted)}

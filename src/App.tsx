@@ -2,6 +2,7 @@ import { ManagedText, ManagedAnchor, siteText } from './cms/PublicContent';
 import { usePublicContent, PublicContentStatus } from './cms/PublicContent';
 import { PendingScreen } from './components/PendingScreen';
 import { MobileHomeSection } from './components/MobileHomeSection';
+import {accountDestination,hasManagementAccess,signInDestination} from './routing/accountDestination';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -44,7 +45,8 @@ import { BookingScreens } from './components/booking/BookingScreens';
 
 export default function App() {
   useSiteLocation();
-  const isAdminApp = window.location.pathname === '/admin' || window.location.hostname.toLowerCase().startsWith('admin.');
+  const isAdminApp = resolveRoute(window.location.pathname).kind === 'admin' || window.location.hostname.toLowerCase().startsWith('admin.');
+  useEffect(()=>{if(isAdminApp)applyPageMetadata(routeMetadata(resolveRoute('/admin')));},[isAdminApp]);
   if (isAdminApp) return <Suspense fallback={<PendingScreen />}><AdminApp/></Suspense>;
   return <SiteApp/>;
 }
@@ -58,13 +60,14 @@ function SiteApp() {
   useEffect(() => {
     const redirect = legacyRouteRedirect(location.pathname, location.search);
     if (redirect) { navigateTo(redirect + location.hash, { replace: true }); return; }
-    if (!['shop', 'product', 'checkout', 'shop-manage'].includes(route.kind)) applyPageMetadata(routeMetadata(route, undefined, tours));
+    if (!['shop', 'product', 'checkout', 'shop-manage'].includes(route.kind)) {const meta=routeMetadata(route,undefined,tours);if(route.kind==='home'&&publicContent.siteSettings){meta.title=publicContent.siteSettings.homeTitle||meta.title;meta.description=publicContent.siteSettings.homeDescription||meta.description;}applyPageMetadata(meta);}
   }, [location.pathname, location.search, tours, publicContent]);
   useEffect(() => { if (location.hash) requestAnimationFrame(() => { try { document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView(); } catch { /* Ignore malformed fragments. */ } }); }, [location.pathname, location.hash]);
   useMotionImages();
-  useApplyDesignSettings();
+  useApplyDesignSettings(location.pathname);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
-  useEffect(() => { authApi.me().then(({ user }) => setCurrentUser(user)).catch(() => setCurrentUser(null)); }, []);
+  const [authLoading,setAuthLoading]=useState(true);
+  useEffect(() => {let active=true;authApi.me().then(({user})=>{if(active)setCurrentUser(user);}).catch(()=>{if(active)setCurrentUser(null);}).finally(()=>{if(active)setAuthLoading(false);});return()=>{active=false;};}, []);
   // Language State ('fa' | 'en')
   const lang='fa' as const;
 
@@ -75,6 +78,7 @@ function SiteApp() {
   const [cartItems, setCartItems] = useState<TourCartItem[]>(() => { try { return sanitizeTourCart(JSON.parse(localStorage.getItem(TOUR_CART_KEY) || '[]')); } catch { return []; } });
   useEffect(() => { if (!toursLoading && !toursError) setCartItems(items => sanitizeTourCart(items, tours)); }, [tours, toursLoading, toursError]);
   const profilePageOpen = route.kind === 'account';
+  useEffect(()=>{if(profilePageOpen&&currentUser&&hasManagementAccess(currentUser.role))navigateTo(accountDestination(currentUser.role),{replace:true});},[profilePageOpen,currentUser]);
   const shopPageOpen = ['shop', 'product', 'checkout', 'shop-manage'].includes(route.kind);
   useEffect(() => { try { localStorage.setItem(TOUR_CART_KEY, JSON.stringify(cartItems)); setCartStorageError(false); } catch { setCartStorageError(true); } }, [cartItems]);
   useEffect(() => { setSearchModalOpen(false); setCartOpen(false); }, [location.pathname]);
@@ -88,8 +92,8 @@ function SiteApp() {
   const openSearch = (query = '') => { setSearchQuery(query); setSearchModalOpen(true); };
 
   const openProfilePage = useCallback(() => {
-    navigateTo('/account');
-  }, []);
+    navigateTo(accountDestination(currentUser?.role));
+  }, [currentUser?.role]);
 
   const closeProfilePage = useCallback(() => {
     navigateTo('/');
@@ -123,6 +127,7 @@ function SiteApp() {
   if (['tour-booking','booking-return','booking-receipt','booking-test'].includes(route.kind)) return <BookingScreens route={route} />;
 
   if (profilePageOpen) {
+    if(authLoading||currentUser&&hasManagementAccess(currentUser.role))return <PendingScreen/>;
     return (
       <Suspense fallback={<PendingScreen />}>
         <UserProfileModal
@@ -166,6 +171,7 @@ function SiteApp() {
               navigateTo(tab === 'register' ? '/register' : '/login');
             }}
             currentUserName={currentUser?.fullName}
+            currentUserRole={currentUser?.role}
             onOpenProfile={openProfilePage}
           />
 
@@ -239,7 +245,7 @@ function SiteApp() {
       {/* Core tools are eager and independent of optional lazy overlays. */}
       <SiteSearch isOpen={searchModalOpen} initialQuery={searchQuery} onClose={() => setSearchModalOpen(false)} />
       <TourCartDrawer isOpen={cartOpen} items={cartItems} storageError={cartStorageError} onClose={() => setCartOpen(false)} onUpdate={(id, changes) => setCartItems(items => sanitizeTourCart(items.map(item => item.tourId === id ? { ...item, ...changes } : item), tours))} onRemove={id => setCartItems(items => items.filter(item => item.tourId !== id))} onCheckout={handleCartCheckout} />
-      {authRoute && <Suspense fallback={<PendingScreen />}><AuthModal key={route.kind} isOpen initialTab={route.kind as 'login' | 'register'} onClose={() => navigateTo('/')} onLoginSuccess={user => { setCurrentUser(user); const target=new URLSearchParams(location.search).get('returnTo');if(target){try{const url=new URL(target,window.location.origin);if(url.origin===window.location.origin&&!['/login','/register'].includes(url.pathname)){navigateTo(url.pathname+url.search+url.hash);return;}}catch{}}openProfilePage(); }} /></Suspense>}
+      {authRoute && <Suspense fallback={<PendingScreen />}><AuthModal key={route.kind} isOpen initialTab={route.kind as 'login' | 'register'} onClose={() => navigateTo('/')} onLoginSuccess={user => { setCurrentUser(user);setAuthLoading(false);navigateTo(signInDestination(user.role,new URLSearchParams(location.search).get('returnTo'),window.location.origin),{replace:true}); }} /></Suspense>}
 
 
     </div>

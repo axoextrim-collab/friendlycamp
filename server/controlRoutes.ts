@@ -1,3 +1,4 @@
+import {publicSiteSettings} from './operationalSettings';
 import {asyncFilter} from './asyncCollections';
 
 import type express from 'express';
@@ -26,7 +27,7 @@ export function registerControlRoutes(app: express.Express) {
                 next(error);
         }
     };
-    app.get('/api/site/content', run(async (_req, res) => res.json(await publishedContent())));
+    app.get('/api/site/content', run(async (_req, res) => res.json({...await publishedContent(),siteSettings:await publicSiteSettings()})));
     app.get('/api/manage/session', requireUser, run((req, res) => {
         if (!ROLE_PERMISSIONS[req.user!.role]?.length)
             return fail(403, 'حساب شما دسترسی مدیریت ندارد.');

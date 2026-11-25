@@ -12,7 +12,7 @@ import fs from "node:fs";
 import crypto from "node:crypto";
 import { createServer as createViteServer } from "vite";
 import helmet from "helmet";
-import rateLimit from "express-rate-limit";
+import rateLimit, {ipKeyGenerator} from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import multer from "multer";
 import { ZodError } from "zod";
@@ -29,6 +29,9 @@ import { registerBookingRoutes } from './server/bookingRoutes';
 import { BookingError } from './server/bookingProviders';
 import { bookingTours } from './server/bookingCatalog';
 import { registerControlRoutes } from './server/controlRoutes';
+import { registerDashboardRoutes } from './server/dashboard';
+import { settingsContext, registerSettingsRoutes, publicSiteSettings } from './server/operationalSettings';
+import { registerSiteThemeRoutes, siteThemeRecord } from './server/siteTheme';
 import { controlAudit, publishedContent } from './server/controlStore';
 async function startServer() {
     validateDeployment();
@@ -85,9 +88,13 @@ async function startServer() {
     app.use(express.json({ limit: "32kb" }));
     app.use(cookieParser());
     app.use(optionalSession);
-    app.use("/api", rateLimit({ windowMs: 60000, limit: 120, standardHeaders: "draft-8", legacyHeaders: false }));
+    app.use("/api", rateLimit({ windowMs: 60000, limit:req=>req.user&&req.user.role!=='user'?600:120,keyGenerator:req=>ipKeyGenerator(req.ip||req.socket.remoteAddress||'unavailable'), standardHeaders: "draft-8", legacyHeaders: false,message:{error:'RATE_LIMITED',message:'تعداد درخواست‌ها زیاد است؛ کمی بعد دوباره تلاش کنید.'} }));
+    app.use('/api',settingsContext);
     registerBookingRoutes(app, new URL(process.env.PUBLIC_SITE_URL || process.env.RENDER_EXTERNAL_URL || (isProduction ? 'https://friendlycamp.ir' : `http://localhost:${PORT}`)).origin);
     registerControlRoutes(app);
+    registerDashboardRoutes(app);
+    registerSettingsRoutes(app);
+    registerSiteThemeRoutes(app);
     registerSupportRoutes(app);
     registerDiscoveryRoutes(app);
     const authLimiter = rateLimit({ windowMs: 15 * 60000, limit: 10, standardHeaders: "draft-8", legacyHeaders: false });
@@ -195,8 +202,8 @@ async function startServer() {
     });
     app.get("/api/site/design-settings", async (_req, res, next) => {
         try {
-            res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
-            res.json({ settings: await publicDesignSettings() });
+            res.setHeader("Cache-Control", "no-store");
+            res.json({ settings:{...await publicDesignSettings(),appearance:(await siteThemeRecord()).theme} });
         }
         catch (error) {
             next(error);
@@ -469,7 +476,9 @@ async function startServer() {
             if (/\.[^/]+$/.test(req.path))
                 return res.status(404).type('text/plain').send('Not found');
             const metadata = metadataForPath(req.path, await shopCatalog(), await bookingTours());
-            let html = renderPageHtml(await fs.promises.readFile(templatePath, 'utf8'), metadata, siteOrigin);
+            const siteSettings=await publicSiteSettings();
+            if(req.path==='/'){if(siteSettings.homeTitle)metadata.title=siteSettings.homeTitle;if(siteSettings.homeDescription)metadata.description=siteSettings.homeDescription;}
+            let html = renderPageHtml(await fs.promises.readFile(templatePath, 'utf8'), metadata, siteOrigin,siteSettings.siteName,req.path==='/admin'||req.path==='/shop/manage'||req.hostname.toLowerCase().startsWith('admin.')?undefined:(await siteThemeRecord()).theme);
             if (transformHtml)
                 html = await transformHtml(req.originalUrl, html);
             return res.status(metadata.notFound ? 404 : 200).type('html').send(html);

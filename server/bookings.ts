@@ -1,4 +1,5 @@
 import {asyncMap} from './asyncCollections';
+import { reservationHoldSeconds } from './operationalSettings';
 
 import crypto from 'node:crypto';
 import type { z } from 'zod';
@@ -127,7 +128,7 @@ export async function createReservation(input: z.infer<typeof reservationSchema>
             throw new BookingError('CAPACITY_EXCEEDED', 'ظرفیت کافی برای این تعداد مسافر باقی نمانده است.', 409);
         const now = Date.now();
         const reference = `FCB-${crypto.randomBytes(8).toString('hex').toUpperCase()}`;
-        const ttl = Math.min(1800, Math.max(1, Number(process.env.BOOKING_HOLD_SECONDS) || 900));
+        const ttl = reservationHoldSeconds();
         const payload: Payload = { quote, passengers: input.passengers.map(passenger => ({ fullName: passenger.fullName, nationalCode: passenger.nationalCode! })), contact: { fullName: input.contact.fullName, phone: input.contact.phone!, email: input.contact.email! }, mode, consentAt: new Date(now).toISOString() };
         await bookingDb().prepare("INSERT INTO reservations(reference,request_key,request_hash,departure_id,seats,state,allocated,expires_at,created_at,payload,owner_id) VALUES(?,?,?,?,?,'pending',1,?,?,?,?)").run(reference, input.requestKey, hash, input.selection.departureId, input.selection.guests, now + ttl * 1000, now, JSON.stringify(payload), userId || null);
         await bookingAudit('reservation.hold', reference, 'customer');

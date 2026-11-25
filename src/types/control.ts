@@ -13,4 +13,4 @@ export const ROLE_PERMISSIONS: Record<AccountRole, readonly string[]> = {
   reservations: ['tours','reservations','coupons'],
 };
 export function canManage(role: AccountRole, permission: string) { return ROLE_PERMISSIONS[role]?.some(value => value === '*' || value === permission) ?? false; }
-export interface PublicSiteContent { destinations: any[]; articles: any[]; text: Record<string,string>; contact: Record<string,string>; social: any[]; licenses: any[]; policies?:any[]; leaders?:import('./discovery').LeaderProfile[] }
+export interface PublicSiteContent { siteSettings?:{siteName:string;homeTitle:string;homeDescription:string}; destinations: any[]; articles: any[]; text: Record<string,string>; contact: Record<string,string>; social: any[]; licenses: any[]; policies?:any[]; leaders?:import('./discovery').LeaderProfile[] }

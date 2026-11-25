@@ -1,4 +1,6 @@
 import {FavoriteTours} from './pages/FavoriteTours';
+import {accountDestination,hasManagementAccess} from '../routing/accountDestination';
+import {navigateTo} from '../routing/navigation';
 import {CapacityAlertsPanel} from './CapacityAlerts';
 import './pages/tour-discovery.css';
 import { AccountBookings, AccountSupport } from './profile/AccountBookings';
@@ -49,6 +51,7 @@ export function UserProfileModal({ isOpen, onClose, onRequireAuth, onUserChanged
     const controller = new AbortController(); setLoading(true); setNotice(null);
     profileApi.get(controller.signal).then(data => {
       if (controller.signal.aborted) return;
+      if(hasManagementAccess(data.user.role)){navigateTo(accountDestination(data.user.role),{replace:true});return;}
       setProfile(data.profile); setSaved(data.profile); setUser(data.user); setAccount(accountFromUser(data.user));
     }).catch(error => {
       if (controller.signal.aborted) return;

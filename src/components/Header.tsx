@@ -1,6 +1,8 @@
 import { ManagedText, ManagedAnchor, siteText } from '../cms/PublicContent';
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Menu, X, ShoppingBag, User } from 'lucide-react';
+import { Search, Menu, X, ShoppingBag, User, LayoutDashboard } from 'lucide-react';
+import type {AccountRole} from '../types/control';
+import {accountDestination,hasManagementAccess} from '../routing/accountDestination';
 import { FriendlyCampLogo } from './FriendlyCampLogo';
 import { SiteLink, useSiteLocation } from '../routing/navigation';
 import { sectionPath } from '../routing/routes';
@@ -14,6 +16,7 @@ interface HeaderProps {
   onOpenAuth?: (initialTab?: 'login' | 'register') => void;
   onOpenProfile?: () => void;
   currentUserName?: string;
+  currentUserRole?: AccountRole;
   overlay?: boolean;
   onOpenCart?: () => void;
   cartCount?: number;
@@ -28,6 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAuth,
   onOpenProfile,
   currentUserName,
+  currentUserRole,
   overlay = false,
   onOpenCart,
   cartCount = 0
@@ -117,8 +121,8 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Login / Register Button */}
           {currentUserName && onOpenProfile ? (
-            <SiteLink href="/account" className="flex items-center gap-2 bg-lime-300 text-emerald-950 px-4 py-2 rounded-full text-xs font-black shadow-lg hover:bg-lime-200 transition" id="header-profile-btn" aria-label={siteText("باز کردن پروفایل همسفر")}>
-              <User size={20}/><span className="max-w-28 truncate hidden sm:inline"><ManagedText value={"پروفایل "}/><ManagedText value={currentUserName.split(' ')[0]}/></span>
+            <SiteLink href={accountDestination(currentUserRole)} className="flex items-center gap-2 bg-lime-300 text-emerald-950 px-4 py-2 rounded-full text-xs font-black shadow-lg hover:bg-lime-200 transition" id="header-profile-btn" aria-label={hasManagementAccess(currentUserRole)?'باز کردن پنل مدیریت':siteText("باز کردن پروفایل همسفر")}>
+              {hasManagementAccess(currentUserRole)?<LayoutDashboard size={20}/>:<User size={20}/>}<span className="max-w-28 truncate hidden sm:inline">{hasManagementAccess(currentUserRole)?'پنل مدیریت':<><ManagedText value={"پروفایل "}/><ManagedText value={currentUserName.split(' ')[0]}/></>}</span>
             </SiteLink>
           ) : onOpenAuth && (
             <SiteLink href="/login"

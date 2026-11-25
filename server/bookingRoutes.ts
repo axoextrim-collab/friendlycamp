@@ -1,4 +1,5 @@
 import {asyncMap} from './asyncCollections';
+import { withOperationalSettings } from './operationalSettings';
 
 import { saleReadiness } from './travelReadiness';
 import type express from 'express';
@@ -42,6 +43,6 @@ export function registerBookingRoutes(app: express.Express, origin: string) {
     app.post('/api/admin/booking/departures', requirePermission('reservations'), run(async (req, res) => res.status(201).json({ departure: await saveDeparture(req.body, req.user!.email) })));
     app.post('/api/admin/booking/reservations/:reference/retry-refund', requirePermission('reservations'), run(async (req, res) => res.json({ booking: await finishBookingRefund(req.params.reference) })));
     app.post('/api/admin/booking/reservations/:reference/retry-sms', requirePermission('reservations'), run(async (req, res) => { await deliverBookingSms(req.params.reference); return res.json({ capabilities: bookingCapabilities() }); }));
-    const timer = setInterval(() => { retryBookingJobs().catch(() => undefined); }, 30000);
+    const timer = setInterval(() => { withOperationalSettings(()=>retryBookingJobs()).catch(() => undefined); }, 30000);
     timer.unref();
 }
